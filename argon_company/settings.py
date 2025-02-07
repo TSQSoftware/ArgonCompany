@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'argon_company',
     'worker',
     'order',
+    'form',
 ]
 
 MIDDLEWARE = [
