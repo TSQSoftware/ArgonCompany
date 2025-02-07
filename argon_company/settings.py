@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'ninja',
     'argon_company',
     'worker',
-    'order',
+    'tasks',
     'form',
 ]
 

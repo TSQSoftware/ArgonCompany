@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('contact_phone_number', models.CharField(blank=True, max_length=50, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
                 ('workers', models.ManyToManyField(blank=True, to='worker.worker')),
-                ('type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='order.ordertype')),
+                ('type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='tasks.ordertype')),
             ],
         ),
     ]
