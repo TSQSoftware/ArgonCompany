@@ -5,6 +5,7 @@ from worker.models import Worker
 
 class TaskType(models.Model):
     name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -19,4 +20,4 @@ class Task(models.Model):
     workers = models.ManyToManyField(Worker, blank=True)
 
     def __str__(self):
-        return f"{self.type.name} {self.name} [{self.workers.count()} workers]"
+        return f"{self.type.name if self.type else ''} | {self.name} [{self.workers.count()} workers]"
