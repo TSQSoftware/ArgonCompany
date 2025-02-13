@@ -1,3 +1,4 @@
+from uuid import uuid4
 from django.http import JsonResponse
 from ninja import Router
 
@@ -6,6 +7,18 @@ from worker.schemas import WorkerSchema, WorkerCreateSchema, WorkerUpdateSchema
 
 router = Router()
 
+@router.get("/login")
+def login(request, activation_key: str, first_name: str, last_name: str):
+    try:
+        worker = Worker.objects.get(activation_key=activation_key, first_name=first_name, last_name=last_name)
+    except Worker.DoesNotExist:
+        return JsonResponse({'error': 'Worker not found'}, status=404)
+
+    uuid = uuid4()
+    worker.uuid = uuid
+    worker.save()
+
+    return JsonResponse({'uuid': uuid})
 
 @router.post('/create', response=WorkerSchema)
 def create_worker(request, payload: WorkerCreateSchema):

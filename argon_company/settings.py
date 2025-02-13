@@ -128,3 +128,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 VERSION = 1
+
+CENTRAL_URL = "http://dswcsogwc84o4so88osk088c.57.129.132.234.sslip.io/"
