@@ -36,7 +36,6 @@ class TaskSchema(ModelSchema):
         workers = obj.workers.all()
         return [SimpleWorkerSchema.from_orm(worker).dict() for worker in workers] if workers else None
 
-
     class Meta:
         model = Task
         exclude = ('type',)
@@ -48,6 +47,7 @@ class TaskCreateSchema(Schema):
     address: str
     contact_phone_number: str
     description: str
+
 
 class TaskUpdateSchema(Schema):
     name: str = None

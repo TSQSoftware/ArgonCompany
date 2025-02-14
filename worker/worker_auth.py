@@ -19,3 +19,5 @@ class WorkerAuth(HttpBearer):
             return worker
         except (jwt.ExpiredSignatureError, jwt.InvalidTokenError, Worker.DoesNotExist):
             return None
+
+worker_auth = WorkerAuth()
