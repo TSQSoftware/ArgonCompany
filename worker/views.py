@@ -8,6 +8,7 @@ from ninja import Router
 
 from worker.models import Worker
 from worker.schemas import WorkerSchema, WorkerCreateSchema, WorkerUpdateSchema
+from worker.worker_auth import worker_auth
 
 router = Router()
 
@@ -31,6 +32,12 @@ def login(request, activation_key: str, first_name: str, last_name: str):
     token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
 
     return JsonResponse({'token': token})
+
+@router.get('/own', response=WorkerSchema, auth=worker_auth)
+def own(request):
+    worker = request.worker
+    return worker
+
 
 @router.post('/create', response=WorkerSchema)
 def create_worker(request, payload: WorkerCreateSchema):
@@ -74,3 +81,4 @@ def delete_worker(request, worker_id: int):
 
     worker.delete()
     return JsonResponse({'success': True})
+
