@@ -1,9 +1,7 @@
-from idlelib.query import Query
-
 from ninja import Router
 
-from form.models import Form, FormAnswer, Question
-from form.schemas import SimpleFormSchema, FormAnswerSchema, QuestionSchema
+from form.models import Form, FormAnswer, Question, Answer
+from form.schemas import SimpleFormSchema, FormAnswerSchema, QuestionSchema, AnswerSchema
 from worker.worker_auth import worker_auth
 
 router = Router()
@@ -23,3 +21,7 @@ def get_form_answers(request, form_id: int):
 @router.get('/questions/{form_id}', auth=worker_auth, response=list[QuestionSchema])
 def get_questions(request, form_id: int):
     return Question.objects.filter(form=form_id)
+
+@router.get("/answers/{form_answer_id}", auth=worker_auth, response=list[AnswerSchema])
+def get_answers(request, form_answer_id: int):
+    return Answer.objects.filter(form_answer=form_answer_id)

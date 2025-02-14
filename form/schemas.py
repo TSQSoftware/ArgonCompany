@@ -1,6 +1,6 @@
 from ninja import ModelSchema
 
-from form.models import Form, FormAnswer, Question
+from form.models import Form, FormAnswer, Question, Answer
 
 
 class FormSchema(ModelSchema):
@@ -21,4 +21,9 @@ class FormAnswerSchema(ModelSchema):
 class QuestionSchema(ModelSchema):
     class Meta:
         model = Question
+        fields = '__all__'
+
+class AnswerSchema(ModelSchema):
+    class Meta:
+        model = Answer
         fields = '__all__'
