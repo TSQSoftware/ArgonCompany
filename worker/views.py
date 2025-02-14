@@ -1,4 +1,8 @@
+import datetime
 from uuid import uuid4
+
+import jwt
+from argon_company import settings
 from django.http import JsonResponse
 from ninja import Router
 
@@ -18,7 +22,15 @@ def login(request, activation_key: str, first_name: str, last_name: str):
     worker.uuid = uuid
     worker.save()
 
-    return JsonResponse({'uuid': uuid})
+    payload = {
+        'uuid': str(uuid),
+        'worker_id': worker.id,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=31)
+    }
+
+    token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+
+    return JsonResponse({'token': token})
 
 @router.post('/create', response=WorkerSchema)
 def create_worker(request, payload: WorkerCreateSchema):

@@ -4,6 +4,7 @@ from ninja import Router
 from tasks.models import TaskType, Task
 from tasks.schemas import TaskTypeSchema, TaskTypeCreateSchema, TaskSchema, TaskCreateSchema, TaskTypeUpdateSchema, \
     TaskUpdateSchema
+from worker.worker_auth import WorkerAuth
 
 router = Router()
 
@@ -72,9 +73,17 @@ def get_tasks(request):
     return Task.objects.all()
 
 
-@router.get('/tasks/{worker_id}', response=list[TaskSchema])
+@router.get('/tasks/id/{worker_id}', response=list[TaskSchema])
 def get_worker_tasks(request, worker_id: int):
     return Task.objects.filter(workers__in=[worker_id]).all()
+
+
+@router.get('/tasks/own', response=list[TaskSchema], auth=WorkerAuth())
+def get_own_tasks(request):
+    if not hasattr(request, "worker"):
+        return JsonResponse({"error": "Worker not authenticated"}, status=401)
+
+    return Task.objects.filter(workers__in=[request.worker.id]).all()
 
 
 @router.get('/task/{task_id}', response=TaskSchema)

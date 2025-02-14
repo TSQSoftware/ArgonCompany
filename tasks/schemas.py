@@ -1,6 +1,7 @@
 from ninja import ModelSchema, Schema
 
 from tasks.models import TaskType, Task
+from worker.schemas import SimpleWorkerSchema
 
 
 class TaskTypeSchema(ModelSchema):
@@ -21,9 +22,24 @@ class TaskTypeUpdateSchema(Schema):
 
 
 class TaskSchema(ModelSchema):
+    task_type: dict | None
+    workers: list[dict] | None = None
+
+    @staticmethod
+    def resolve_task_type(obj: Task) -> dict | None:
+        if obj.type:
+            return TaskTypeSchema.from_orm(obj.type).dict()
+        return None
+
+    @staticmethod
+    def resolve_workers(obj: Task) -> list[dict] | None:
+        workers = obj.workers.all()
+        return [SimpleWorkerSchema.from_orm(worker).dict() for worker in workers] if workers else None
+
+
     class Meta:
         model = Task
-        fields = '__all__'
+        exclude = ('type',)
 
 
 class TaskCreateSchema(Schema):

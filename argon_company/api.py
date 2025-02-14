@@ -1,4 +1,4 @@
-from django.conf import settings
+from argon_company import settings
 from ninja import NinjaAPI
 
 from tasks.views import router as order_router

@@ -11,6 +11,11 @@ class WorkerSchema(ModelSchema):
         model = Worker
         fields = '__all__'
 
+class SimpleWorkerSchema(ModelSchema):
+    class Meta:
+        model = Worker
+        exclude = ('date_of_birth', 'phone_number', 'is_active', 'activation_key', 'uuid')
+
 
 class WorkerCreateSchema(Schema):
     first_name: str
@@ -18,6 +23,7 @@ class WorkerCreateSchema(Schema):
     date_of_birth: Optional[date] = None
     phone_number: Optional[str] = None
     role: Optional[WorkerRole] = None
+
 
 class WorkerUpdateSchema(Schema):
     first_name: str = None
