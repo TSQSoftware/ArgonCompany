@@ -8,3 +8,5 @@ PyJWT==2.10.1
 sqlparse==0.5.3
 typing_extensions==4.12.2
 uuid==1.30
+
+geopy~=2.4.1

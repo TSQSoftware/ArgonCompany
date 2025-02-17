@@ -1,3 +1,5 @@
+from geopy.exc import GeocoderTimedOut
+from geopy.geocoders import Nominatim
 from ninja import ModelSchema, Schema
 
 from tasks.models import TaskType, Task
@@ -24,6 +26,7 @@ class TaskTypeUpdateSchema(Schema):
 class TaskSchema(ModelSchema):
     task_type: dict | None
     workers: list[dict] | None = None
+    task_location: str | None
 
     @staticmethod
     def resolve_task_type(obj: Task) -> dict | None:
@@ -35,6 +38,29 @@ class TaskSchema(ModelSchema):
     def resolve_workers(obj: Task) -> list[dict] | None:
         workers = obj.workers.all()
         return [SimpleWorkerSchema.from_orm(worker).dict() for worker in workers] if workers else None
+
+    @staticmethod
+    def resolve_task_location(obj: 'Task') -> str | None:
+        if obj.location is None:
+            return None
+
+        if isinstance(obj.location, str):
+            try:
+                lat, lon = map(float, obj.location.split(','))
+                geolocator = Nominatim(user_agent="myGeocoder")
+
+                try:
+                    location = geolocator.reverse((lat, lon), language='pl', timeout=1)
+                    return location.address if location else None
+                except GeocoderTimedOut:
+                    return None
+                except Exception:
+                    return None
+
+            except ValueError:
+                return None
+
+        return None
 
     class Meta:
         model = Task

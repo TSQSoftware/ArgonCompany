@@ -11,6 +11,19 @@ class WorkerSchema(ModelSchema):
         model = Worker
         fields = '__all__'
 
+
+class CompanyWorkerSchema(ModelSchema):
+    company_name: str
+
+    @staticmethod
+    def resolve_company_name(obj: Worker) -> str:
+        return "COMPANY NAME"
+
+    class Meta:
+        model = Worker
+        fields = '__all__'
+
+
 class SimpleWorkerSchema(ModelSchema):
     class Meta:
         model = Worker

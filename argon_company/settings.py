@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'worker',
     'tasks',
     'form',
+    'location_field.apps.DefaultConfig',
 ]
 
 MIDDLEWARE = [

@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from ninja import Router
 
 from worker.models import Worker
-from worker.schemas import WorkerSchema, WorkerCreateSchema, WorkerUpdateSchema
+from worker.schemas import WorkerSchema, WorkerCreateSchema, WorkerUpdateSchema, CompanyWorkerSchema
 from worker.worker_auth import worker_auth
 
 router = Router()
@@ -33,7 +33,7 @@ def login(request, activation_key: str, first_name: str, last_name: str):
 
     return JsonResponse({'token': token})
 
-@router.get('/own', response=WorkerSchema, auth=worker_auth)
+@router.get('/own', response=CompanyWorkerSchema, auth=worker_auth)
 def own(request):
     worker = request.worker
     return worker
