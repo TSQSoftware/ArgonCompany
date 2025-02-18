@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -131,3 +132,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 VERSION = 1
 
 CENTRAL_URL = "http://dswcsogwc84o4so88osk088c.57.129.132.234.sslip.io/"
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+]
+
+ASGI_APPLICATION = 'argon_company.asgi.application'

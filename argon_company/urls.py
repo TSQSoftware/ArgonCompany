@@ -15,11 +15,16 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 
 from argon_company import api
+from tasks.consumers import TasksConsumer
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', api.api.urls),
+]
+
+websocket_urlpatterns = [
+    re_path(r"ws/tasks/$", TasksConsumer.as_asgi()),
 ]

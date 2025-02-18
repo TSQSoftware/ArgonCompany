@@ -40,7 +40,9 @@ class TaskSchema(ModelSchema):
         return [SimpleWorkerSchema.from_orm(worker).dict() for worker in workers] if workers else None
 
     @staticmethod
-    def resolve_task_location(obj: 'Task') -> str | None:
+    def resolve_task_location(obj: Task) -> str | None:
+        return None
+
         if obj.location is None:
             return None
 

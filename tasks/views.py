@@ -1,9 +1,14 @@
+import random
+
 from django.http import JsonResponse
+from faker import Faker
+from geopy import Point
 from ninja import Router
 
-from tasks.models import TaskType, Task
+from tasks.models import TaskType, Task, TaskStatus
 from tasks.schemas import TaskTypeSchema, TaskTypeCreateSchema, TaskSchema, TaskCreateSchema, TaskTypeUpdateSchema, \
     TaskUpdateSchema
+from worker.models import Worker
 from worker.worker_auth import worker_auth
 
 router = Router()
@@ -85,6 +90,46 @@ def get_own_tasks(request):
 
     return Task.objects.filter(workers__in=[request.worker.id]).all()
 
+fake = Faker()
+
+@router.post('/tasks/random', response=TaskSchema)
+def test_task_random(request):
+    task_name = fake.sentence(nb_words=3)
+    task_address = fake.address()
+
+    task_description = fake.text()
+    task_status = random.choice([status for status in TaskStatus])
+
+    latitude = random.uniform(36.0, 71.0)
+    longitude = random.uniform(-31.0, 40.0)
+    location_str = f"{latitude},{longitude}"
+
+    task_type_name = fake.word()
+    task_type_description = fake.text()
+    task_type = TaskType.objects.create(
+        name=task_type_name,
+        description=task_type_description
+    )
+
+    task = Task.objects.create(
+        name=task_name,
+        address=task_address,
+        description=task_description,
+        status=task_status,
+    )
+
+    task.location = location_str
+    task.type = task_type
+
+    workers = Worker.objects.all()
+    num_workers_to_assign = random.randint(1, len(workers))
+    selected_workers = random.sample(list(workers), num_workers_to_assign)
+
+    task.workers.set(selected_workers)
+
+    task.save()
+
+    return task
 
 @router.get('/task/{task_id}', response=TaskSchema)
 def get_task(request, task_id: int):
