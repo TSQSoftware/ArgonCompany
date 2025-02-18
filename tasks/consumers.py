@@ -1,6 +1,9 @@
 import json
-from channels.generic.websocket import AsyncWebsocketConsumer
+from datetime import datetime, date
+
 from asgiref.sync import sync_to_async
+from channels.generic.websocket import AsyncWebsocketConsumer
+
 from tasks.models import Task
 from tasks.schemas import TaskSchema
 
@@ -24,11 +27,11 @@ class TasksConsumer(AsyncWebsocketConsumer):
                 self.group_name = f'task_updates_{self.worker_id}'
                 await self.channel_layer.group_add(self.group_name, self.channel_name)
                 await self.send(
-                    text_data=json.dumps({"message": f"Subscribed to task updates for worker {self.worker_id}"}))
+                    text_data=json.dumps({"message": f"Subscribed to task updates for worker {self.worker_id}"}, default=TasksConsumer.date_serializer))
 
                 # Get tasks for the worker and send them
                 tasks = await self.get_tasks(self.worker_id)
-                await self.send(text_data=json.dumps({"tasks": tasks}))
+                await self.send(text_data=json.dumps({"tasks": tasks}, default=TasksConsumer.date_serializer))
 
     async def disconnect(self, close_code):
         if self.group_name:
@@ -42,4 +45,13 @@ class TasksConsumer(AsyncWebsocketConsumer):
 
     async def task_update(self, event):
         tasks = await self.get_tasks(self.worker_id)
-        await self.send(text_data=json.dumps({"tasks": tasks}))
+        await self.send(text_data=json.dumps({"tasks": tasks}, default=TasksConsumer.date_serializer))
+
+    @staticmethod
+    def date_serializer(obj):
+        """
+        Serialize datetime and date objects into ISO 8601 format.
+        """
+        if isinstance(obj, (datetime, date)):
+            return obj.isoformat()
+        raise TypeError(f"Type {obj.__class__.__name__} not serializable")

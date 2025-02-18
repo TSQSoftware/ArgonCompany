@@ -26,6 +26,9 @@ class Task(models.Model):
     workers = models.ManyToManyField(Worker, blank=True)
     location = PlainLocationField(based_fields=['latitude', 'longitude'], zoom=7, null=True, blank=True)
     status = models.CharField(choices=TaskStatus.choices, default=TaskStatus.NOT_STARTED, max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deadline = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.type.name if self.type else ''} | {self.name} [{self.workers.count()} workers]"
