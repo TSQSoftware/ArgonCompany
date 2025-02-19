@@ -25,7 +25,6 @@ SECRET_KEY = 'django-insecure-+7+tt@3$muwddy0d%4p#1!9h!_*u13*%#p@kjx$r%a#r1r@t^^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -132,7 +131,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 VERSION = 1
 
 CENTRAL_URL = "http://dswcsogwc84o4so88osk088c.57.129.132.234.sslip.io/"
-
+SERVER_URL = "okccs000gsowwo8c0csko8wo.57.129.132.234.sslip.io"
 
 CHANNEL_LAYERS = {
     "default": {
@@ -146,3 +145,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 ASGI_APPLICATION = 'argon_company.asgi.application'
+
+ALLOWED_HOSTS = [
+    SERVER_URL,
+]
