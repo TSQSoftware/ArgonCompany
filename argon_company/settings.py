@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-+7+tt@3$muwddy0d%4p#1!9h!_*u13*%#p@kjx$r%a#r1r@t^^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', "True") == "True"
 
 # Application definition
 
@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'argon_company.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-if False:
+if DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -159,4 +159,5 @@ ASGI_APPLICATION = 'argon_company.asgi.application'
 
 ALLOWED_HOSTS = [
     SERVER_URL,
+    'localhost'
 ]
