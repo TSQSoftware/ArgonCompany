@@ -155,6 +155,7 @@ CHANNEL_LAYERS = {
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
+    SERVER_IP,
 ]
 
 ASGI_APPLICATION = 'argon_company.asgi.application'
