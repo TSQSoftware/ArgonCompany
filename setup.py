@@ -6,7 +6,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'argon_company.settings'
 
 # Główna aplikacja Django Ninja
 executables = [
-    Executable("manage.py", base=None, target_name="ArgonCentral")
+    Executable("manage.py", base=None, target_name="ArgonCompany")
 ]
 
 # Opcje cx_Freeze
@@ -19,9 +19,9 @@ options = {
 }
 
 setup(
-    name="ArgonCentral",
+    name="ArgonCompany",
     version="1.0",
-    description="aplikacja ArgonCentral",
+    description="aplikacja ArgonCompany",
     options=options,
     executables=executables,
 )
