@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-+7+tt@3$muwddy0d%4p#1!9h!_*u13*%#p@kjx$r%a#r1r@t^^'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', "True") == "True"
@@ -142,8 +142,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 VERSION = 1
 
+COMPANY_NAME = os.getenv('COMPANY_NAME')
+SERVER_IP = os.getenv('SERVER_IP')
+
 CENTRAL_URL = "http://dswcsogwc84o4so88osk088c.57.129.132.234.sslip.io/"
-SERVER_URL = "okccs000gsowwo8c0csko8wo.57.129.132.234.sslip.io"
 
 CHANNEL_LAYERS = {
     "default": {
@@ -158,6 +160,6 @@ CORS_ALLOWED_ORIGINS = [
 ASGI_APPLICATION = 'argon_company.asgi.application'
 
 ALLOWED_HOSTS = [
-    SERVER_URL,
+    SERVER_IP,
     'localhost'
 ]

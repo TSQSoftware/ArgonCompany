@@ -1,4 +1,5 @@
 @echo off
+chcp 1250
 setlocal EnableDelayedExpansion
 
 :: ==============================
@@ -15,41 +16,38 @@ set SKIP_LICENSE=0
 set APP_PORT=8000
 
 :: ==============================
-:: CHOOSE INSTALLATION LANGUAGE
+:: CHOOSE INSTALLATION LANGUAGE (DEFAULT: ENGLISH)
 :: ==============================
-echo Select installation language / Wybierz język instalacji:
-echo 1. English
-echo 2. Polski
-set /p LANG="Enter number / Wpisz numer (1/2): "
+echo Select installation language:
+echo [1] English (default)
+echo [2] Polski
+set /p LANG="Enter number (1/2): "
 
-if "%LANG%"=="1" (
-    set MSG_CHECKING_PYTHON=[INFO] Checking if Python is installed...
-    set MSG_USING_SYSTEM_PYTHON=[INFO] Python found! Using system Python.
-    set MSG_USING_EMBEDDED_PYTHON=[INFO] Python not found. Using embedded version...
-    set MSG_CREATING_VENV=[INFO] Creating virtual environment...
-    set MSG_INSTALLING_DEPENDENCIES=[INFO] Installing dependencies...
-    set MSG_ENTER_SERVER_IP=Enter server IP (e.g., 127.0.0.1):
-    set MSG_ENTER_COMPANY_NAME=Enter company name:
-    set MSG_ENTER_LICENSE_KEY=Enter license key:
-    set MSG_VALIDATING_LICENSE=[INFO] Validating license...
-    set MSG_INVALID_LICENSE=[ERROR] Invalid license key. Try again.
-    set MSG_LICENSE_SUCCESS=[INFO] License validated successfully!
-    set MSG_CREATING_ENV_FILE=[INFO] Creating .env configuration...
-    set MSG_STARTING_APP=[INFO] Starting Django application...
-) else (
-    set MSG_CHECKING_PYTHON=[INFO] Sprawdzanie czy Python jest zainstalowany...
-    set MSG_USING_SYSTEM_PYTHON=[INFO] Python znaleziony! Używam systemowego Pythona.
-    set MSG_USING_EMBEDDED_PYTHON=[INFO] Python nie znaleziony. Pobieram wersję wbudowaną...
-    set MSG_CREATING_VENV=[INFO] Tworzenie wirtualnego środowiska...
-    set MSG_INSTALLING_DEPENDENCIES=[INFO] Instalowanie zależności...
-    set MSG_ENTER_SERVER_IP=Wprowadź adres IP serwera (np. 127.0.0.1):
-    set MSG_ENTER_COMPANY_NAME=Wprowadź nazwę firmy:
+if "%LANG%"=="" set LANG=1  :: Default to English if empty
+if "%LANG%"=="2" (
+    set MSG_ENTER_COMPANY=Wprowadź nazwę firmy:
+    set MSG_ENTER_SERVER_IP=Wprowadź adres IP serwera:
     set MSG_ENTER_LICENSE_KEY=Wprowadź klucz licencyjny:
-    set MSG_VALIDATING_LICENSE=[INFO] Sprawdzanie licencji...
-    set MSG_INVALID_LICENSE=[ERROR] Nieprawidłowy klucz licencyjny. Spróbuj ponownie.
-    set MSG_LICENSE_SUCCESS=[INFO] Licencja pomyślnie zweryfikowana!
-    set MSG_CREATING_ENV_FILE=[INFO] Tworzenie konfiguracji .env...
-    set MSG_STARTING_APP=[INFO] Uruchamianie aplikacji Django...
+    set MSG_VALIDATING_LICENSE=Sprawdzanie licencji...
+    set MSG_INVALID_LICENSE=Nieprawidłowy klucz licencyjny. Spróbuj ponownie.
+    set MSG_LICENSE_SUCCESS=Licencja zweryfikowana!
+    set MSG_PYTHON_INSTALL=Instalacja Python...
+    set MSG_REPO_CLONE=Pobieranie repozytorium...
+    set MSG_UPDATE_REPO=Aktualizowanie repozytorium...
+    set MSG_STARTING_APP=Uruchamianie aplikacji...
+    set MSG_MIGRATIONS=Uruchamianie migracji Django...
+) else (
+    set MSG_ENTER_COMPANY=Enter company name:
+    set MSG_ENTER_SERVER_IP=Enter server IP address:
+    set MSG_ENTER_LICENSE_KEY=Enter license key:
+    set MSG_VALIDATING_LICENSE=Validating license...
+    set MSG_INVALID_LICENSE=Invalid license key. Try again.
+    set MSG_LICENSE_SUCCESS=License validated successfully!
+    set MSG_PYTHON_INSTALL=Installing Python...
+    set MSG_REPO_CLONE=Cloning repository...
+    set MSG_UPDATE_REPO=Updating repository...
+    set MSG_STARTING_APP=Starting application...
+    set MSG_MIGRATIONS=Running Django migrations...
 )
 
 :: ==============================
@@ -60,6 +58,24 @@ if exist "%FOLDER%\%ENV_FILE%" (
     set SKIP_LICENSE=1
 ) else (
     set SKIP_LICENSE=0
+)
+
+:: ==============================
+:: CHECK & INSTALL PYTHON
+:: ==============================
+where python >nul 2>nul
+if %errorlevel% equ 0 (
+    for /f "delims=" %%A in ('python -c "import sys; print(sys.executable)"') do set PYTHON_EXE=%%A
+    echo [INFO] Python detected at %PYTHON_EXE%
+) else (
+    echo [INFO] Python not found. Using embedded Python...
+    if not exist "%PYTHON_FOLDER%" (
+        mkdir "%PYTHON_FOLDER%"
+        curl -o python.zip %PYTHON_URL%
+        powershell -Command "Expand-Archive -Path 'python.zip' -DestinationPath '%PYTHON_FOLDER%'"
+        del python.zip
+    )
+    set PYTHON_EXE=%CD%\%PYTHON_FOLDER%\python.exe
 )
 
 :: ==============================
@@ -76,96 +92,109 @@ if exist "%FOLDER%" (
 )
 
 :: ==============================
-:: CHECK IF PYTHON IS INSTALLED
+:: CREATE VIRTUAL ENVIRONMENT (IF PYTHON INSTALLED)
 :: ==============================
-echo %MSG_CHECKING_PYTHON%
-where python >nul 2>nul
-if %errorlevel% == 0 (
-    echo %MSG_USING_SYSTEM_PYTHON%
-    set "USE_SYSTEM_PYTHON=1"
-    set "PYTHON_CMD=python"
-) else (
-    echo %MSG_USING_EMBEDDED_PYTHON%
-    set "USE_SYSTEM_PYTHON=0"
-)
-
-:: DOWNLOAD & SETUP EMBEDDED PYTHON IF NECESSARY
-if %USE_SYSTEM_PYTHON%==0 (
-    if not exist "%PYTHON_FOLDER%" (
-        echo [INFO] Downloading embedded Python...
-        curl -o python.zip %PYTHON_URL%
-        mkdir %PYTHON_FOLDER%
-        powershell -Command "Expand-Archive -Path python.zip -DestinationPath %PYTHON_FOLDER%"
-        del python.zip
-    )
-    set "PYTHON_CMD=%CD%\%PYTHON_FOLDER%\python.exe"
-)
-
-:: CREATE VENV IF SYSTEM PYTHON IS USED
-if %USE_SYSTEM_PYTHON%==1 (
-    echo %MSG_CREATING_VENV%
-    %PYTHON_CMD% -m venv %VENV_FOLDER%
+if exist "%PYTHON_EXE%" (
+    echo [INFO] Creating virtual environment...
+    %PYTHON_EXE% -m venv %VENV_FOLDER%
     call %VENV_FOLDER%\Scripts\activate
+) else (
+    echo [ERROR] Python installation failed.
+    exit /b 1
 )
 
-:: INSTALL PIP (FOR EMBEDDED PYTHON)
-if %USE_SYSTEM_PYTHON%==0 (
-    %PYTHON_CMD% -m ensurepip
-    %PYTHON_CMD% -m pip install --upgrade pip
-)
-
+:: ==============================
 :: INSTALL DEPENDENCIES
-echo %MSG_INSTALLING_DEPENDENCIES%
-%PYTHON_CMD% -m pip install -r requirements.txt
+:: ==============================
+echo [INFO] Installing dependencies...
+pip install -r requirements.txt
 
 :: ==============================
 :: USER CONFIGURATION
 :: ==============================
+:LICENSE_LOOP
 if %SKIP_LICENSE%==0 (
-    set /p SERVER_IP="%MSG_ENTER_SERVER_IP% "
-    set /p COMPANY_NAME="%MSG_ENTER_COMPANY_NAME% "
+    :COMPANY_INPUT
+    set /p COMPANY_NAME="%MSG_ENTER_COMPANY% "
+    if "!COMPANY_NAME!"=="" (
+        echo [ERROR] Company name cannot be empty.
+        goto COMPANY_INPUT
+    )
 
-    :LICENSE_LOOP
+    :SERVER_IP_INPUT
+    set /p SERVER_IP="%MSG_ENTER_SERVER_IP% "
+    if "!SERVER_IP!"=="" (
+        echo [ERROR] Server IP cannot be empty.
+        goto SERVER_IP_INPUT
+    )
+
+    :LICENSE_KEY_INPUT
     set /p LICENSE_KEY="%MSG_ENTER_LICENSE_KEY% "
+    if "!LICENSE_KEY!"=="" (
+        echo [ERROR] License key cannot be empty.
+        goto LICENSE_KEY_INPUT
+    )
 
     echo %MSG_VALIDATING_LICENSE%
-    curl -s -X POST "%LICENSE_SERVER%?company_name=%COMPANY_NAME%&company_key=%LICENSE_KEY%&ipv4_address=%SERVER_IP%" -o license.json
+    curl -s -X POST "%LICENSE_SERVER%?company_name=!COMPANY_NAME!&company_key=!LICENSE_KEY!&ipv4_address=!SERVER_IP!" -o license.json
 
-    for /f "tokens=1 delims=:" %%A in ('powershell -Command "(Get-Content license.json | ConvertFrom-Json).active"') do set LICENSE_STATUS=%%A
-    for /f "tokens=1 delims=:" %%A in ('powershell -Command "(Get-Content license.json | ConvertFrom-Json).uuid"') do set LICENSE_UUID=%%A
-
-    if "!LICENSE_STATUS!"=="True" (
-        echo %MSG_LICENSE_SUCCESS%
-    ) else (
-        echo %MSG_INVALID_LICENSE%
+    if not exist license.json (
+        echo [ERROR] License response is missing!
         goto LICENSE_LOOP
     )
 
-    set /p APP_PORT="Enter application port (e.g., 8000): "
+    for /f "tokens=*" %%A in ('findstr /i "error" license.json') do (
+        echo [ERROR] License error found: %%A
+        echo [ERROR] License validation failed. Exiting...
+        goto LICENSE_LOOP
+    )
 
-    :: GENERATE SECRET_KEY
-    for /f %%A in ('powershell -Command "[guid]::NewGuid().ToString()"') do set SECRET_KEY=%%A
+    echo %MSG_LICENSE_SUCCESS%
 
-    :: CREATE .env FILE
-    echo %MSG_CREATING_ENV_FILE%
-    echo SERVER_IP=%SERVER_IP% > %ENV_FILE%
-    echo COMPANY_NAME=%COMPANY_NAME% >> %ENV_FILE%
-    echo APP_PORT=%APP_PORT% >> %ENV_FILE%
-    echo LICENSE_KEY=%LICENSE_KEY% >> %ENV_FILE%
-    echo UUID=%LICENSE_UUID% >> %ENV_FILE%
-    echo SECRET_KEY=%SECRET_KEY% >> %ENV_FILE%
+    echo COMPANY_NAME=!COMPANY_NAME! >> %ENV_FILE%
+    echo SERVER_IP=!SERVER_IP! >> %ENV_FILE%
+    echo LICENSE_KEY=!LICENSE_KEY! >> %ENV_FILE%
 
-    del license.json
+    set CHARS="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%%^&*()_+-=[]{}|;:,.<>?/~"
+
+    set SECRET_KEY=
+    for /l %%i in (1,1,128) do (
+        set /a RAND_INDEX=!random! %% 94
+        for %%A in (!RAND_INDEX!) do set SECRET_KEY=!SECRET_KEY!!CHARS:~%%A,1!
+    )
+
+    echo SECRET_KEY=!SECRET_KEY! >> %ENV_FILE%
+    echo [INFO] SECRET_KEY generated and saved to %ENV_FILE%
+
+    :: Save server IP to address.txt in the correct folder
+    echo !SERVER_IP! > address.txt
+    echo [INFO] Server address saved to address.txt
+
+    if not "!APP_PORT!"=="" (
+        echo PORT=!APP_PORT! >> %ENV_FILE%
+    )
 ) else (
     echo [INFO] Skipping license check, using existing .env file...
-    for /f "tokens=2 delims==" %%A in ('findstr "^APP_PORT=" %ENV_FILE%') do set APP_PORT=%%A
 )
 
 :: ==============================
 :: RUN DJANGO MIGRATIONS & START APP
 :: ==============================
-echo [INFO] Running database migrations...
-%PYTHON_CMD% manage.py migrate
+echo %MSG_MIGRATIONS%
+python manage.py migrate
 
 echo %MSG_STARTING_APP%
-%PYTHON_CMD% manage.py runserver 0.0.0.0:%APP_PORT%
+:: Read server address from file (fallback to 0.0.0.0 if missing)
+if exist address.txt (
+    set /p SERVER_ADDRESS=<address.txt
+) else (
+    set SERVER_ADDRESS=0.0.0.0
+    echo [WARNING] address.txt not found. Using default address 0.0.0.0
+)
+
+if "!SERVER_ADDRESS!"=="" (
+    set SERVER_ADDRESS=0.0.0.0
+    echo [WARNING] address.txt is empty. Using default address 0.0.0.0
+)
+
+python manage.py runserver !SERVER_ADDRESS!:%APP_PORT%
