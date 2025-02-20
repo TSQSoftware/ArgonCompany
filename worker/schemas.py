@@ -1,9 +1,9 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Optional
 
 from ninja import ModelSchema, Schema
 
-from worker.models import Worker, WorkerRole
+from worker.models import Worker, WorkerRole, WorkerLocation
 
 
 class WorkerSchema(ModelSchema):
@@ -44,3 +44,15 @@ class WorkerUpdateSchema(Schema):
     date_of_birth: Optional[date] = None
     phone_number: Optional[str] = None
     role: Optional[WorkerRole] = None
+
+class WorkerLocationSchema(ModelSchema):
+    class Meta:
+        model = WorkerLocation
+        fields = '__all__'
+
+class WorkerLocationCreateSchema(Schema):
+    timestamp: datetime
+    altitude: float
+    speed: float
+    longitude: float
+    latitude: float

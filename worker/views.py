@@ -2,15 +2,17 @@ import datetime
 from uuid import uuid4
 
 import jwt
-from argon_company import settings
 from django.http import JsonResponse
 from ninja import Router
 
-from worker.models import Worker
-from worker.schemas import WorkerSchema, WorkerCreateSchema, WorkerUpdateSchema, CompanyWorkerSchema
+from argon_company import settings
+from worker.models import Worker, WorkerLocation
+from worker.schemas import WorkerSchema, WorkerCreateSchema, WorkerUpdateSchema, CompanyWorkerSchema, \
+    WorkerLocationSchema, WorkerLocationCreateSchema
 from worker.worker_auth import worker_auth
 
 router = Router()
+
 
 @router.get("/login")
 def login(request, activation_key: str, first_name: str, last_name: str):
@@ -33,6 +35,7 @@ def login(request, activation_key: str, first_name: str, last_name: str):
 
     return JsonResponse({'token': token})
 
+
 @router.get('/own', response=CompanyWorkerSchema, auth=worker_auth)
 def own(request):
     worker = request.worker
@@ -46,7 +49,7 @@ def create_worker(request, payload: WorkerCreateSchema):
     return worker
 
 
-@router.patch('/{worker_id}', response=WorkerSchema)
+@router.patch('/worker/{worker_id}', response=WorkerSchema)
 def update_worker(request, worker_id: int, payload: WorkerUpdateSchema):
     try:
         worker = Worker.objects.get(id=worker_id)
@@ -72,7 +75,8 @@ def activate_worker(request, worker_id: int):
     worker.set_random_activation_key()
     return worker
 
-@router.delete('/{worker_id}')
+
+@router.delete('/worker/{worker_id}')
 def delete_worker(request, worker_id: int):
     try:
         worker = Worker.objects.get(id=worker_id)
@@ -82,3 +86,11 @@ def delete_worker(request, worker_id: int):
     worker.delete()
     return JsonResponse({'success': True})
 
+
+@router.post('/location', auth=worker_auth, response=WorkerLocationSchema)
+def post_location(request, payload: WorkerLocationCreateSchema):
+    worker = request.worker
+
+    worker_location = WorkerLocation.objects.create(worker=worker, **payload.dict())
+
+    return worker_location

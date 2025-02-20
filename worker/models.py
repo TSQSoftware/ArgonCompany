@@ -24,3 +24,14 @@ class Worker(models.Model):
         self.activation_key = str(uuid.uuid4())
         self.save()
         return self.activation_key
+
+class WorkerLocation(models.Model):
+    worker = models.ForeignKey(Worker, on_delete=models.SET_NULL, null=True, blank=True)
+    timestamp = models.DateTimeField()
+    altitude = models.FloatField(blank=True, null=True)
+    speed = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField()
+    latitude = models.FloatField()
+
+    def __str__(self):
+        return f"{self.timestamp} {self.altitude} {self.speed} {self.longitude} {self.latitude}"
