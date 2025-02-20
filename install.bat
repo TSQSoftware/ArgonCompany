@@ -121,12 +121,14 @@ if %SKIP_LICENSE%==0 (
         goto COMPANY_INPUT
     )
 
-    :SERVER_IP_INPUT
-    set /p SERVER_IP="%MSG_ENTER_SERVER_IP% "
-    if "!SERVER_IP!"=="" (
-        echo [ERROR] Server IP cannot be empty.
-        goto SERVER_IP_INPUT
-    )
+	:SERVER_IP_INPUT
+	set /p SERVER_IP="%MSG_ENTER_SERVER_IP% "
+	:: Remove trailing spaces
+	for /f "tokens=* delims=" %%a in ("!SERVER_IP!") do set SERVER_IP=%%a
+	if "!SERVER_IP!"=="" (
+		echo [ERROR] Server IP cannot be empty.
+		goto SERVER_IP_INPUT
+	)
 
     :LICENSE_KEY_INPUT
     set /p LICENSE_KEY="%MSG_ENTER_LICENSE_KEY% "
@@ -136,7 +138,7 @@ if %SKIP_LICENSE%==0 (
     )
 
     echo %MSG_VALIDATING_LICENSE%
-    curl -s -X POST "%LICENSE_SERVER%?company_name=!COMPANY_NAME!&company_key=!LICENSE_KEY!&ipv4_address=!SERVER_IP!" -o license.json
+    curl -s -X POST "%LICENSE_SERVER%?company_name="!COMPANY_NAME!"&company_key="!LICENSE_KEY!"&ipv4_address=!SERVER_IP!" -o license.json
 
     if not exist license.json (
         echo [ERROR] License response is missing!
@@ -167,8 +169,8 @@ if %SKIP_LICENSE%==0 (
     echo [INFO] SECRET_KEY generated and saved to %ENV_FILE%
 
     :: Save server IP to address.txt in the correct folder
-    echo !SERVER_IP! > address.txt
-    echo [INFO] Server address saved to address.txt
+	> address.txt echo !SERVER_IP!
+    echo [INFO] Server address !SERVER_IP! saved to address.txt
 
     if not "!APP_PORT!"=="" (
         echo PORT=!APP_PORT! >> %ENV_FILE%
@@ -196,5 +198,7 @@ if "!SERVER_ADDRESS!"=="" (
     set SERVER_ADDRESS=0.0.0.0
     echo [WARNING] address.txt is empty. Using default address 0.0.0.0
 )
+
+echo [INFO] Launching server at !SERVER_ADDRESS!:%APP_PORT%
 
 python manage.py runserver !SERVER_ADDRESS!:%APP_PORT%
