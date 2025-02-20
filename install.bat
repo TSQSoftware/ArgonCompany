@@ -168,6 +168,8 @@ if %SKIP_LICENSE%==0 (
     echo SECRET_KEY=!SECRET_KEY! >> %ENV_FILE%
     echo [INFO] SECRET_KEY generated and saved to %ENV_FILE%
 
+    echo DEBUG=False >> %ENV_FILE%
+
     :: Save server IP to address.txt in the correct folder
 	> address.txt echo !SERVER_IP!
     echo [INFO] Server address !SERVER_IP! saved to address.txt
