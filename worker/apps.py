@@ -14,6 +14,12 @@ def run_update_license():
         print(f"\n❌ Error running update_license: {e}\n")
         sys.exit(1)
 
+def run_create_admin():
+    """Executes create_admin command."""
+    try:
+        call_command("create_admin")
+    except Exception as e:
+        print(f"\n❌ Error running create_admin: {e}\n")
 
 class WorkerConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
@@ -24,3 +30,4 @@ class WorkerConfig(AppConfig):
         if not settings.DEBUG:
             if "runserver" in sys.argv and not os.environ.get("RUN_MAIN"):
                 run_update_license()
+                run_create_admin()
