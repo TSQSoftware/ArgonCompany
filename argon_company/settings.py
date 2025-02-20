@@ -133,7 +133,7 @@ VERSION = 1
 COMPANY_NAME = os.getenv('COMPANY_NAME')
 SERVER_IP = os.getenv('SERVER_IP')
 
-CENTRAL_URL = "http://localhost:8000/"
+CENTRAL_URL = "http://dswcsogwc84o4so88osk088c.57.129.132.234.sslip.io/"
 
 CHANNEL_LAYERS = {
     "default": {
