@@ -138,7 +138,7 @@ if %SKIP_LICENSE%==0 (
     )
 
     echo %MSG_VALIDATING_LICENSE%
-    curl -s -X POST "%LICENSE_SERVER%?company_name="!COMPANY_NAME!"&company_key="!LICENSE_KEY!"&ipv4_address=!SERVER_IP!" -o license.json
+    curl -s -X POST "%LICENSE_SERVER%?company_name="!COMPANY_NAME!"&activation_key="!LICENSE_KEY!"&ipv4_address=!SERVER_IP!" -o license.json
 
     if not exist license.json (
         echo [ERROR] License response is missing!
