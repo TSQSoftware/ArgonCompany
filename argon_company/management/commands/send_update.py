@@ -27,7 +27,7 @@ class Command(BaseCommand):
         if not license_id or not license_uuid:
             raise ValueError("Missing required fields (id, uuid) in license.json.")
 
-        version = getattr(settings, "VERSION", 0)
+        version = settings.VERSION
         url = f"{settings.CENTRAL_URL}api/v1/server/update?license_id={license_id}&license_uuid={license_uuid}"
         payload = {"version": version}
 

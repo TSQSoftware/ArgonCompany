@@ -128,7 +128,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-VERSION = 1
+VERSION = "1.0.1"
 
 COMPANY_NAME = os.getenv('COMPANY_NAME')
 SERVER_IP = os.getenv('SERVER_IP')
