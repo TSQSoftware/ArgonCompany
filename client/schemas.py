@@ -1,6 +1,7 @@
 from ninja import ModelSchema
 
 from client.models import Client, ClientMachine, ClientPlace
+from data.schemas import TaskCategorySchema
 
 
 class ClientSchema(ModelSchema):
@@ -32,6 +33,12 @@ class ClientPlaceSchema(ModelSchema):
 
 
 class ClientMachineSchema(ModelSchema):
+    category: dict
+
+    @staticmethod
+    def resolve_category(obj: ClientMachine) -> dict:
+        return TaskCategorySchema.from_orm(obj.category).dict()
+
     class Meta:
         model = ClientMachine
         fields = '__all__'
