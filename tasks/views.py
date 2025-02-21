@@ -1,14 +1,8 @@
-import random
-
 from django.http import JsonResponse
-from faker import Faker
-from geopy import Point
 from ninja import Router
 
-from tasks.models import Task, TaskStatus
-from tasks.schemas import TaskSchema, TaskCreateSchema, TaskTypeUpdateSchema, \
-    TaskUpdateSchema
-from worker.models import Worker
+from tasks.models import Task
+from tasks.schemas import TaskSchema
 from worker.worker_auth import worker_auth
 
 router = Router()

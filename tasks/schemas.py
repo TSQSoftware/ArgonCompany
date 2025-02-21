@@ -54,7 +54,7 @@ class TaskSchema(ModelSchema):
 
     class Meta:
         model = Task
-        exclude = ('type',)
+        fields = '__all__'
 
 
 class TaskCreateSchema(Schema):
