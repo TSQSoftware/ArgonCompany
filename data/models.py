@@ -20,10 +20,26 @@ class TaskCategory(models.Model):
     def __str__(self):
         return self.name
 
+from django.db import models
+
+class TagColor(models.TextChoices):
+    RED = "ff0000", "Red"
+    BLUE = "0000ff", "Blue"
+    GREEN = "00ff00", "Green"
+    YELLOW = "ffff00", "Yellow"
+    ORANGE = "ffa500", "Orange"
+    PURPLE = "800080", "Purple"
+    PINK = "ffc0cb", "Pink"
+    BLACK = "000000", "Black"
+    WHITE = "ffffff", "White"
+    GRAY = "808080", "Gray"
+    CYAN = "00ffff", "Cyan"
+    MAGENTA = "ff00ff", "Magenta"
+    BROWN = "a52a2a", "Brown"
 
 class Tag(models.Model):
     name = models.CharField(max_length=100)
-    color = models.CharField(max_length=10)
+    color = models.CharField(max_length=6, choices=TagColor.choices, default=TagColor.GRAY)
 
     class Meta:
         verbose_name_plural = "Tags"
