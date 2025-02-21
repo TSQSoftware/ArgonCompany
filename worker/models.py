@@ -5,7 +5,7 @@ from django.db import models
 class WorkerRole(models.TextChoices):
     WORKER = "worker", "Worker"
     MOD = "mod", "Moderator"
-    ADMIN = "data", "Administrator"
+    ADMIN = "admin", "Administrator"
 
 class Worker(models.Model):
     first_name = models.CharField(max_length=50)

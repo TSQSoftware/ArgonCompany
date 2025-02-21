@@ -22,7 +22,7 @@ from argon_company import api, settings
 from tasks.consumers import TasksConsumer
 
 urlpatterns = [
-    path('data/', admin.site.urls),
+    path('admin/', admin.site.urls),
     path('api/v1/', api.api.urls),
 ]
 
