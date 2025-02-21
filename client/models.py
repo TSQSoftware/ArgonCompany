@@ -5,9 +5,13 @@ from data.models import TaskCategory
 
 class ClientMachine(models.Model):
     name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
     category = models.ForeignKey(TaskCategory, on_delete=models.CASCADE, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
 
 class ClientObject(models.Model):
     name = models.CharField(max_length=100)
@@ -16,6 +20,9 @@ class ClientObject(models.Model):
     machines = models.ManyToManyField(ClientMachine, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
 
 class Client(models.Model):
     name = models.CharField(max_length=100)
