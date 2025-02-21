@@ -16,39 +16,19 @@ set SKIP_LICENSE=0
 set APP_PORT=8000
 
 :: ==============================
-:: CHOOSE INSTALLATION LANGUAGE (DEFAULT: ENGLISH)
+:: ENGLISH MESSAGES
 :: ==============================
-echo Select installation language:
-echo [1] English (default)
-echo [2] Polski
-set /p LANG="Enter number (1/2): "
-
-if "%LANG%"=="" set LANG=1  :: Default to English if empty
-if "%LANG%"=="2" (
-    set MSG_ENTER_COMPANY=Wprowadź nazwę firmy:
-    set MSG_ENTER_SERVER_IP=Wprowadź adres IP serwera:
-    set MSG_ENTER_LICENSE_KEY=Wprowadź klucz licencyjny:
-    set MSG_VALIDATING_LICENSE=Sprawdzanie licencji...
-    set MSG_INVALID_LICENSE=Nieprawidłowy klucz licencyjny. Spróbuj ponownie.
-    set MSG_LICENSE_SUCCESS=Licencja zweryfikowana!
-    set MSG_PYTHON_INSTALL=Instalacja Python...
-    set MSG_REPO_CLONE=Pobieranie repozytorium...
-    set MSG_UPDATE_REPO=Aktualizowanie repozytorium...
-    set MSG_STARTING_APP=Uruchamianie aplikacji...
-    set MSG_MIGRATIONS=Uruchamianie migracji Django...
-) else (
-    set MSG_ENTER_COMPANY=Enter company name:
-    set MSG_ENTER_SERVER_IP=Enter server IP address:
-    set MSG_ENTER_LICENSE_KEY=Enter license key:
-    set MSG_VALIDATING_LICENSE=Validating license...
-    set MSG_INVALID_LICENSE=Invalid license key. Try again.
-    set MSG_LICENSE_SUCCESS=License validated successfully!
-    set MSG_PYTHON_INSTALL=Installing Python...
-    set MSG_REPO_CLONE=Cloning repository...
-    set MSG_UPDATE_REPO=Updating repository...
-    set MSG_STARTING_APP=Starting application...
-    set MSG_MIGRATIONS=Running Django migrations...
-)
+set MSG_ENTER_COMPANY=Enter company name:
+set MSG_ENTER_SERVER_IP=Enter server IP address:
+set MSG_ENTER_LICENSE_KEY=Enter license key:
+set MSG_VALIDATING_LICENSE=Validating license...
+set MSG_INVALID_LICENSE=Invalid license key. Try again.
+set MSG_LICENSE_SUCCESS=License validated successfully!
+set MSG_PYTHON_INSTALL=Installing Python...
+set MSG_REPO_CLONE=Cloning repository...
+set MSG_UPDATE_REPO=Updating repository...
+set MSG_STARTING_APP=Starting application...
+set MSG_MIGRATIONS=Running Django migrations...
 
 :: ==============================
 :: CHECK IF APP WAS INSTALLED BEFORE
@@ -92,7 +72,7 @@ if exist "%FOLDER%" (
 )
 
 :: ==============================
-:: CREATE VIRTUAL ENVIRONMENT (IF PYTHON INSTALLED)
+:: CREATE VIRTUAL ENVIRONMENT
 :: ==============================
 if exist "%PYTHON_EXE%" (
     echo [INFO] Creating virtual environment...
@@ -121,14 +101,13 @@ if %SKIP_LICENSE%==0 (
         goto COMPANY_INPUT
     )
 
-	:SERVER_IP_INPUT
-	set /p SERVER_IP="%MSG_ENTER_SERVER_IP% "
-	:: Remove trailing spaces
-	for /f "tokens=* delims=" %%a in ("!SERVER_IP!") do set SERVER_IP=%%a
-	if "!SERVER_IP!"=="" (
-		echo [ERROR] Server IP cannot be empty.
-		goto SERVER_IP_INPUT
-	)
+    :SERVER_IP_INPUT
+    set /p SERVER_IP="%MSG_ENTER_SERVER_IP% "
+    for /f "tokens=* delims=" %%a in ("!SERVER_IP!") do set SERVER_IP=%%a
+    if "!SERVER_IP!"=="" (
+        echo [ERROR] Server IP cannot be empty.
+        goto SERVER_IP_INPUT
+    )
 
     :LICENSE_KEY_INPUT
     set /p LICENSE_KEY="%MSG_ENTER_LICENSE_KEY% "
@@ -170,8 +149,7 @@ if %SKIP_LICENSE%==0 (
 
     echo DEBUG=False >> %ENV_FILE%
 
-    :: Save server IP to address.txt in the correct folder
-	> address.txt echo !SERVER_IP!
+    > address.txt echo !SERVER_IP!
     echo [INFO] Server address !SERVER_IP! saved to address.txt
 
     if not "!APP_PORT!"=="" (
@@ -188,7 +166,6 @@ echo %MSG_MIGRATIONS%
 python manage.py migrate
 
 echo %MSG_STARTING_APP%
-:: Read server address from file (fallback to 0.0.0.0 if missing)
 if exist address.txt (
     set /p SERVER_ADDRESS=<address.txt
 ) else (
@@ -203,4 +180,9 @@ if "!SERVER_ADDRESS!"=="" (
 
 echo [INFO] Launching server at !SERVER_ADDRESS!:%APP_PORT%
 
+:: Start server in foreground and capture PID
 python manage.py runserver !SERVER_ADDRESS!:%APP_PORT%
+set SERVER_PID=%ERRORLEVEL%
+
+:: Cleanup on exit
+exit /b 0
