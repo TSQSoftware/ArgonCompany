@@ -3,6 +3,7 @@ from typing import Optional
 
 from ninja import ModelSchema, Schema
 
+from argon_company import settings
 from worker.models import Worker, WorkerRole, WorkerLocation
 
 
@@ -17,7 +18,7 @@ class CompanyWorkerSchema(ModelSchema):
 
     @staticmethod
     def resolve_company_name(obj: Worker) -> str:
-        return "COMPANY NAME"
+        return settings.COMPANY_NAME
 
     class Meta:
         model = Worker
