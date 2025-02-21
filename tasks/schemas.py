@@ -1,8 +1,7 @@
-from geopy.exc import GeocoderTimedOut
-from geopy.geocoders import Nominatim
 from ninja import ModelSchema, Schema
 
-from data.schemas import TaskCategorySchema
+from client.schemas import ClientSchema
+from data.schemas import TaskCategorySchema, TagSchema
 from tasks.models import Task
 from worker.schemas import SimpleWorkerSchema
 
@@ -14,8 +13,9 @@ class TaskTypeUpdateSchema(Schema):
 
 class TaskSchema(ModelSchema):
     category: dict | None
-    workers: list[dict] | None = None
-    task_location: str | None
+    workers: list[dict] | None
+    client: dict | None
+    tags: list[dict] | None
 
     @staticmethod
     def resolve_category(obj: Task) -> dict | None:
@@ -24,38 +24,24 @@ class TaskSchema(ModelSchema):
         return None
 
     @staticmethod
+    def resolve_client(obj: Task) -> dict | None:
+        if obj.client:
+            return ClientSchema.from_orm(obj.client).dict()
+        return None
+
+    @staticmethod
+    def resolve_tags(obj: Task) -> list[dict] | None:
+        tags = obj.tags.all()
+        return [TagSchema.from_orm(tag).dict() for tag in tags] if tags else None
+
+    @staticmethod
     def resolve_workers(obj: Task) -> list[dict] | None:
         workers = obj.workers.all()
         return [SimpleWorkerSchema.from_orm(worker).dict() for worker in workers] if workers else None
 
-    @staticmethod
-    def resolve_task_location(obj: Task) -> str | None:
-        return None
-
-        if obj.location is None:
-            return None
-
-        if isinstance(obj.location, str):
-            try:
-                lat, lon = map(float, obj.location.split(','))
-                geolocator = Nominatim(user_agent="myGeocoder")
-
-                try:
-                    location = geolocator.reverse((lat, lon), language='pl', timeout=1)
-                    return location.address if location else None
-                except GeocoderTimedOut:
-                    return None
-                except Exception:
-                    return None
-
-            except ValueError:
-                return None
-
-        return None
-
     class Meta:
         model = Task
-        exclude = ('category',)
+        fields = '__all__'
 
 
 class TaskCreateSchema(Schema):

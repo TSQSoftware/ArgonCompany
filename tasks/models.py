@@ -1,9 +1,12 @@
 from django.db import models
+from geopy import Nominatim
+from geopy.exc import GeocoderTimedOut
 from location_field.models.plain import PlainLocationField
 
-from data.models import Tag, TaskCategory
 from client.models import Client, ClientObject, ClientMachine
+from data.models import Tag, TaskCategory
 from worker.models import Worker
+
 
 class TaskStatus(models.TextChoices):
     IN_PROGRESS = 'in_progress', 'In progress'
@@ -11,6 +14,7 @@ class TaskStatus(models.TextChoices):
     CANCELLED = 'cancelled', 'Cancelled'
     NOT_STARTED = 'not_started', 'Not started'
     AWAITING_CONFIRMATION = 'awaiting_confirmation', 'Awaiting confirmation'
+
 
 class Task(models.Model):
     name = models.CharField(max_length=100)
@@ -33,3 +37,23 @@ class Task(models.Model):
 
     def __str__(self):
         return f"{self.category.name if self.category else ''} | {self.name} [{self.workers.count()} workers]"
+
+    def get_location(self) -> str | None:
+        if self.location is None:
+            return None
+
+        if isinstance(self.location, str):
+            try:
+                lat, lon = map(float, self.location.split(','))
+                geolocator = Nominatim(user_agent="myGeocoder")
+
+                try:
+                    location = geolocator.reverse((lat, lon), language='pl', timeout=1)
+                    return location.address if location else None
+                except GeocoderTimedOut:
+                    return None
+                except Exception:
+                    return None
+
+            except ValueError:
+                return None
