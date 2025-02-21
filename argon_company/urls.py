@@ -14,17 +14,20 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, re_path
 
-from argon_company import api
+from argon_company import api, settings
 from tasks.consumers import TasksConsumer
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('data/', admin.site.urls),
     path('api/v1/', api.api.urls),
 ]
 
 websocket_urlpatterns = [
     re_path(r"ws/tasks/$", TasksConsumer.as_asgi()),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

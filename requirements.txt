@@ -26,6 +26,7 @@ load-dotenv==0.1.0
 mac-alias==2.2.2
 macholib==1.16.3
 packaging==24.2
+pillow==11.1.0
 psycopg2-binary==2.9.10
 pyasn1==0.6.1
 pyasn1_modules==0.4.1

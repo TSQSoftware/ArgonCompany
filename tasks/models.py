@@ -1,6 +1,8 @@
 from django.db import models
 from location_field.models.plain import PlainLocationField
 
+from data.models import Tag
+from client.models import Client, ClientObject, ClientMachine
 from worker.models import Worker
 
 
@@ -11,11 +13,13 @@ class TaskType(models.Model):
     def __str__(self):
         return self.name
 
+
 class TaskStatus(models.TextChoices):
     IN_PROGRESS = 'in_progress', 'In progress'
     COMPLETED = 'completed', 'Completed'
     CANCELLED = 'cancelled', 'Cancelled'
     NOT_STARTED = 'not_started', 'Not started'
+    AWAITING_CONFIRMATION = 'awaiting_confirmation', 'Awaiting confirmation'
 
 class Task(models.Model):
     name = models.CharField(max_length=100)
@@ -26,6 +30,12 @@ class Task(models.Model):
     workers = models.ManyToManyField(Worker, blank=True)
     location = PlainLocationField(based_fields=['latitude', 'longitude'], zoom=7, null=True, blank=True)
     status = models.CharField(choices=TaskStatus.choices, default=TaskStatus.NOT_STARTED, max_length=50)
+    expected_realization_duration = models.DurationField(null=True, blank=True)
+    expected_realization_date = models.DateField(null=True, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True)
+    client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='client')
+    client_objects = models.ManyToManyField(ClientObject, blank=True, related_name='client_objects')
+    client_machines = models.ManyToManyField(ClientMachine, blank=True, related_name='client_machines')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deadline = models.DateTimeField(null=True, blank=True)

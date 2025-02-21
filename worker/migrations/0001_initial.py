@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('phone_number', models.CharField(blank=True, max_length=50, null=True)),
                 ('is_active', models.BooleanField(default=True)),
                 ('uuid', models.UUIDField(blank=True, null=True)),
-                ('role', models.CharField(choices=[('worker', 'Worker'), ('mod', 'Moderator'), ('admin', 'Administrator')], default='worker', max_length=50)),
+                ('role', models.CharField(choices=[('worker', 'Worker'), ('mod', 'Moderator'), ('data', 'Administrator')], default='worker', max_length=50)),
             ],
         ),
     ]
