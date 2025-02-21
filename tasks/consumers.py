@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -27,7 +27,8 @@ class TasksConsumer(AsyncWebsocketConsumer):
                 self.group_name = f'task_updates_{self.worker_id}'
                 await self.channel_layer.group_add(self.group_name, self.channel_name)
                 await self.send(
-                    text_data=json.dumps({"message": f"Subscribed to task updates for worker {self.worker_id}"}, default=TasksConsumer.date_serializer))
+                    text_data=json.dumps({"message": f"Subscribed to task updates for worker {self.worker_id}"},
+                                         default=TasksConsumer.date_serializer))
 
                 # Get tasks for the worker and send them
                 tasks = await self.get_tasks(self.worker_id)
@@ -50,8 +51,15 @@ class TasksConsumer(AsyncWebsocketConsumer):
     @staticmethod
     def date_serializer(obj):
         """
-        Serialize datetime and date objects into ISO 8601 format.
+        Serialize datetime, date, and timedelta objects into a JSON-serializable format.
+        - datetime/date: ISO 8601 format (e.g., "2024-02-21T15:30:00")
+        - timedelta: ISO 8601 duration format (e.g., "P0DT00H00M30S")
         """
         if isinstance(obj, (datetime, date)):
             return obj.isoformat()
+        elif isinstance(obj, timedelta):
+            total_seconds = int(obj.total_seconds())
+            hours, remainder = divmod(total_seconds, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            return f'P0DT{hours:02}H{minutes:02}M{seconds:02}S'
         raise TypeError(f"Type {obj.__class__.__name__} not serializable")
