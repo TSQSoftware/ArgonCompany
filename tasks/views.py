@@ -1,8 +1,9 @@
 from django.http import JsonResponse
 from ninja import Router
 
-from tasks.models import Task
+from tasks.models import Task, TaskStatus
 from tasks.schemas import TaskSchema
+from worker.models import WorkerRole
 from worker.worker_auth import worker_auth
 
 router = Router()
@@ -42,6 +43,23 @@ def set_workers(request, task_id: int, workers: list[int]):
         return JsonResponse({'error': 'Task not found'}, status=404)
 
     task.workers.set(workers)
+    task.save()
+
+    return task
+
+@router.patch('/task/{task_id}/status', response=TaskSchema, auth=worker_auth)
+def set_status(request, task_id: int, status: TaskStatus):
+    worker = request.worker
+    if status == TaskStatus.COMPLETED or status == TaskStatus.CANCELLED:
+        if worker.role == WorkerRole.WORKER:
+            return JsonResponse({'error': 'Worker not authorized'}, status=401)
+
+    try:
+        task = Task.objects.get(id=task_id)
+    except Task.DoesNotExist:
+        return JsonResponse({'error': 'Task not found'}, status=404)
+
+    task.status = status
     task.save()
 
     return task
