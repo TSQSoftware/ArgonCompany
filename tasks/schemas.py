@@ -6,18 +6,19 @@ from data.schemas import TaskCategorySchema
 from tasks.models import Task
 from worker.schemas import SimpleWorkerSchema
 
+
 class TaskTypeUpdateSchema(Schema):
     name: str = None
     description: str = None
 
 
 class TaskSchema(ModelSchema):
-    task_type: dict | None
+    category: dict | None
     workers: list[dict] | None = None
     task_location: str | None
 
     @staticmethod
-    def resolve_task_type(obj: Task) -> dict | None:
+    def resolve_category(obj: Task) -> dict | None:
         if obj.category:
             return TaskCategorySchema.from_orm(obj.category).dict()
         return None
@@ -54,7 +55,7 @@ class TaskSchema(ModelSchema):
 
     class Meta:
         model = Task
-        fields = '__all__'
+        exclude = ('category',)
 
 
 class TaskCreateSchema(Schema):
