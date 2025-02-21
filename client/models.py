@@ -13,7 +13,7 @@ class ClientObject(models.Model):
     name = models.CharField(max_length=100)
     city = models.CharField(max_length=100, blank=True, null=True)
     address = models.CharField(max_length=100, blank=True, null=True)
-    machines = models.ManyToManyField(ClientMachine)
+    machines = models.ManyToManyField(ClientMachine, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
