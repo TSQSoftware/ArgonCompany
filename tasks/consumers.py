@@ -53,13 +53,14 @@ class TasksConsumer(AsyncWebsocketConsumer):
         """
         Serialize datetime, date, and timedelta objects into a JSON-serializable format.
         - datetime/date: ISO 8601 format (e.g., "2024-02-21T15:30:00")
-        - timedelta: ISO 8601 duration format (e.g., "P0DT00H00M30S")
+        - timedelta: ISO 8601 duration format (e.g., "P3DT04H15M30S" for 3 days, 4 hours, 15 minutes, 30 seconds)
         """
         if isinstance(obj, (datetime, date)):
             return obj.isoformat()
         elif isinstance(obj, timedelta):
             total_seconds = int(obj.total_seconds())
-            hours, remainder = divmod(total_seconds, 3600)
+            days, remainder = divmod(total_seconds, 86400)
+            hours, remainder = divmod(remainder, 3600)
             minutes, seconds = divmod(remainder, 60)
-            return f'P0DT{hours:02}H{minutes:02}M{seconds:02}S'
+            return f'P{days}DT{hours:02}H{minutes:02}M{seconds:02}S'
         raise TypeError(f"Type {obj.__class__.__name__} not serializable")

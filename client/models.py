@@ -10,16 +10,24 @@ class ClientMachine(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = 'Client machine'
+        verbose_name_plural = 'Client machines'
+
     def __str__(self):
         return self.name
 
-class ClientObject(models.Model):
+class ClientPlace(models.Model):
     name = models.CharField(max_length=100)
     city = models.CharField(max_length=100, blank=True, null=True)
     address = models.CharField(max_length=100, blank=True, null=True)
     machines = models.ManyToManyField(ClientMachine, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Client place'
+        verbose_name_plural = 'Client places'
 
     def __str__(self):
         return self.name
@@ -32,9 +40,13 @@ class Client(models.Model):
     phone_number = models.CharField(max_length=100, blank=True, null=True)
     nip_number = models.CharField(max_length=100, blank=True, null=True)
     regon_number = models.CharField(max_length=100, blank=True, null=True)
-    client_objects = models.ManyToManyField(ClientObject, related_name='objects', blank=True)
+    client_places = models.ManyToManyField(ClientPlace, related_name='places', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Client'
+        verbose_name_plural = 'Clients'
 
     def __str__(self):
         return self.name

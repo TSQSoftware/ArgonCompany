@@ -13,6 +13,10 @@ class TaskCategory(models.Model):
     duration_length_minutes = models.IntegerField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
 
+    class Meta:
+        verbose_name_plural = "Task categories"
+        verbose_name = "Task category"
+
     def __str__(self):
         return self.name
 
@@ -20,6 +24,10 @@ class TaskCategory(models.Model):
 class Tag(models.Model):
     name = models.CharField(max_length=100)
     color = models.CharField(max_length=10)
+
+    class Meta:
+        verbose_name_plural = "Tags"
+        verbose_name = "Tag"
 
     def __str__(self):
         return self.name

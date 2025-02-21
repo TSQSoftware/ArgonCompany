@@ -1,6 +1,6 @@
 from ninja import ModelSchema, Schema
 
-from client.schemas import ClientSchema
+from client.schemas import ClientSchema, ClientPlaceSchema, ClientMachineSchema
 from data.schemas import TaskCategorySchema, TagSchema
 from tasks.models import Task
 from worker.schemas import SimpleWorkerSchema
@@ -13,9 +13,11 @@ class TaskTypeUpdateSchema(Schema):
 
 class TaskSchema(ModelSchema):
     category: dict | None
-    workers: list[dict] | None
+    workers: list[dict]
     client: dict | None
-    tags: list[dict] | None
+    tags: list[dict]
+    client_places: list[dict]
+    client_machines: list[dict]
 
     @staticmethod
     def resolve_category(obj: Task) -> dict | None:
@@ -30,14 +32,24 @@ class TaskSchema(ModelSchema):
         return None
 
     @staticmethod
-    def resolve_tags(obj: Task) -> list[dict] | None:
+    def resolve_tags(obj: Task) -> list[dict]:
         tags = obj.tags.all()
-        return [TagSchema.from_orm(tag).dict() for tag in tags] if tags else None
+        return [TagSchema.from_orm(tag).dict() for tag in tags] if tags else []
 
     @staticmethod
-    def resolve_workers(obj: Task) -> list[dict] | None:
+    def resolve_client_places(obj: Task) -> list[dict]:
+        client_places = obj.client_places.all()
+        return [ClientPlaceSchema.from_orm(client_place).dict() for client_place in client_places] if client_places else []
+
+    @staticmethod
+    def resolve_client_machines(obj: Task) -> list[dict]:
+        client_machines = obj.client_machines.all()
+        return [ClientMachineSchema.from_orm(client_machine).dict() for client_machine in client_machines] if client_machines else []
+
+    @staticmethod
+    def resolve_workers(obj: Task) -> list[dict]:
         workers = obj.workers.all()
-        return [SimpleWorkerSchema.from_orm(worker).dict() for worker in workers] if workers else None
+        return [SimpleWorkerSchema.from_orm(worker).dict() for worker in workers] if workers else []
 
     class Meta:
         model = Task

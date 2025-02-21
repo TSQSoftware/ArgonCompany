@@ -3,7 +3,7 @@ from geopy import Nominatim
 from geopy.exc import GeocoderTimedOut
 from location_field.models.plain import PlainLocationField
 
-from client.models import Client, ClientObject, ClientMachine
+from client.models import Client, ClientPlace, ClientMachine
 from data.models import Tag, TaskCategory
 from worker.models import Worker
 
@@ -29,7 +29,7 @@ class Task(models.Model):
     expected_realization_date = models.DateField(null=True, blank=True)
     tags = models.ManyToManyField(Tag, blank=True)
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='related_clients')
-    client_objects = models.ManyToManyField(ClientObject, blank=True, related_name='related_client_objects')
+    client_places = models.ManyToManyField(ClientPlace, blank=True, related_name='related_client_places')
     client_machines = models.ManyToManyField(ClientMachine, blank=True, related_name='related_client_machines')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
