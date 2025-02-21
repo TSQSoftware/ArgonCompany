@@ -1,18 +1,9 @@
 from django.db import models
 from location_field.models.plain import PlainLocationField
 
-from data.models import Tag
+from data.models import Tag, TaskCategory
 from client.models import Client, ClientObject, ClientMachine
 from worker.models import Worker
-
-
-class TaskType(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
 
 class TaskStatus(models.TextChoices):
     IN_PROGRESS = 'in_progress', 'In progress'
@@ -23,7 +14,7 @@ class TaskStatus(models.TextChoices):
 
 class Task(models.Model):
     name = models.CharField(max_length=100)
-    type = models.ForeignKey(TaskType, on_delete=models.SET_NULL, null=True, blank=True)
+    category = models.ForeignKey(TaskCategory, on_delete=models.SET_NULL, null=True, blank=True)
     address = models.CharField(max_length=255, null=True, blank=True)
     contact_phone_number = models.CharField(max_length=50, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
@@ -41,4 +32,4 @@ class Task(models.Model):
     deadline = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.type.name if self.type else ''} | {self.name} [{self.workers.count()} workers]"
+        return f"{self.category.name if self.category else ''} | {self.name} [{self.workers.count()} workers]"

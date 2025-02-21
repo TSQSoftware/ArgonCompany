@@ -2,21 +2,9 @@ from geopy.exc import GeocoderTimedOut
 from geopy.geocoders import Nominatim
 from ninja import ModelSchema, Schema
 
-from tasks.models import TaskType, Task
+from data.schemas import TaskCategorySchema
+from tasks.models import Task
 from worker.schemas import SimpleWorkerSchema
-
-
-class TaskTypeSchema(ModelSchema):
-    class Meta:
-        model = TaskType
-        fields = '__all__'
-
-
-class TaskTypeCreateSchema(ModelSchema):
-    class Meta:
-        model = TaskType
-        exclude = ('id',)
-
 
 class TaskTypeUpdateSchema(Schema):
     name: str = None
@@ -30,8 +18,8 @@ class TaskSchema(ModelSchema):
 
     @staticmethod
     def resolve_task_type(obj: Task) -> dict | None:
-        if obj.type:
-            return TaskTypeSchema.from_orm(obj.type).dict()
+        if obj.category:
+            return TaskCategorySchema.from_orm(obj.category).dict()
         return None
 
     @staticmethod
