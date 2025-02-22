@@ -61,6 +61,7 @@ class Task(models.Model):
             except ValueError:
                 return None
 
+
 class TaskNote(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='notes')
     note = models.TextField()
@@ -81,13 +82,22 @@ class TaskNote(models.Model):
     def save(self, *args, **kwargs):
         if not self.custom_id:
             current_year = (self.created_at if self.created_at else datetime.now()).year
-            note_count = self.task.notes.count() + 1
-            self.custom_id = f"{note_count}/{self.task.id}/{current_year}"
+            notes_count = self.task.notes.count() + 1
+            custom_id = f"/{notes_count}/{self.task.id}/{current_year}"
+
+            while self.__class__.objects.filter(custom_id=custom_id).exists():
+                notes_count += 1
+                custom_id = f"/{notes_count}/{self.task.id}/{current_year}"
+
+            self.custom_id = custom_id
+
         super().save(*args, **kwargs)
+
 
 class TaskAttachment(models.Model):
     task = models.ForeignKey('Task', on_delete=models.CASCADE, related_name='attachments')
-    worker = models.ForeignKey(Worker, on_delete=models.SET_NULL, null=True, blank=True, related_name='task_attachments')
+    worker = models.ForeignKey(Worker, on_delete=models.SET_NULL, null=True, blank=True,
+                               related_name='task_attachments')
     file = models.FileField(upload_to='task_attachments/', blank=True, null=True)
     image = models.ImageField(upload_to='task_images/', blank=True, null=True)
     description = models.TextField(blank=True, null=True)
@@ -110,5 +120,12 @@ class TaskAttachment(models.Model):
         if not self.custom_id:
             current_year = (self.created_at if self.created_at else datetime.now()).year
             attachment_count = self.task.attachments.count() + 1
-            self.custom_id = f"/{attachment_count}/{self.task.id}/{current_year}"
+            custom_id = f"/{attachment_count}/{self.task.id}/{current_year}"
+
+            while self.__class__.objects.filter(custom_id=custom_id).exists():
+                attachment_count += 1
+                custom_id = f"/{attachment_count}/{self.task.id}/{current_year}"
+
+            self.custom_id = custom_id
+
         super().save(*args, **kwargs)
