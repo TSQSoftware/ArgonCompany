@@ -25,7 +25,7 @@ class ClientMachine(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.client_place.name} - {self.name} (#{self.identifier})"
+        return f"{self.client_place.name if self.client_place is not None else ''} - {self.name} (#{self.identifier})"
 
 
 class ClientPlace(models.Model):
