@@ -26,7 +26,6 @@ class ClientMachine(models.Model):
     manufacturer = models.CharField(max_length=100, blank=True, null=True)
     model = models.CharField(max_length=100, blank=True, null=True)
     warranty_expiry = models.DateField(blank=True, null=True)
-    location_notes = models.TextField(blank=True, null=True)
     operating_hours = models.PositiveIntegerField(blank=True, null=True)
     power_supply = models.CharField(max_length=50, blank=True, null=True)
     weight = models.FloatField(blank=True, null=True)
@@ -70,7 +69,6 @@ class ClientPlace(models.Model):
     place_type = models.CharField(max_length=50, choices=ClientPlaceType.choices, blank=True, null=True)
     location = PlainLocationField(based_fields=['latitude', 'longitude'], zoom=7, null=True, blank=True)
     operating_hours = models.TextField(blank=True, null=True)
-    notes = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -101,7 +99,6 @@ class Client(models.Model):
     regon_number = models.CharField(max_length=100, blank=True, null=True)
     status = models.CharField(max_length=50, choices=ClientStatus.choices, default=ClientStatus.ACTIVE)
     client_places = models.ManyToManyField(ClientPlace, related_name="places", blank=True)
-    notes = models.TextField(blank=True, null=True)
     contact_person = models.CharField(max_length=100, blank=True, null=True)
     contact_email = models.EmailField(blank=True, null=True)
     contact_phone = models.CharField(max_length=20, blank=True, null=True)

@@ -2,8 +2,20 @@ from ninja import ModelSchema, Schema
 
 from client.schemas import ClientSchema, ClientPlaceSchema, ClientMachineSchema
 from data.schemas import TaskCategorySchema, TagSchema
-from tasks.models import Task
+from tasks.models import Task, TaskNote, TaskAttachment
 from worker.schemas import SimpleWorkerSchema
+
+
+class TaskNoteSchema(ModelSchema):
+    class Meta:
+        model = TaskNote
+        fields = '__all__'
+
+
+class TaskAttachmentSchema(ModelSchema):
+    class Meta:
+        model = TaskAttachment
+        fields = '__all__'
 
 
 class TaskTypeUpdateSchema(Schema):
@@ -18,6 +30,18 @@ class TaskSchema(ModelSchema):
     tags: list[dict]
     client_places: list[dict]
     client_machines: list[dict]
+    notes: list[dict]
+    attachments: list[dict]
+
+    @staticmethod
+    def resolve_notes(obj: Task) -> list[dict]:
+        notes = obj.notes.all()
+        return [TaskNoteSchema.from_orm(note).dict() for note in notes] if notes else []
+
+    @staticmethod
+    def resolve_attachments(obj: Task) -> list[dict]:
+        attachments = obj.attachments.all()
+        return [TaskAttachmentSchema.from_orm(attachment).dict() for attachment in attachments] if attachments else []
 
     @staticmethod
     def resolve_category(obj: Task) -> dict | None:
@@ -39,12 +63,14 @@ class TaskSchema(ModelSchema):
     @staticmethod
     def resolve_client_places(obj: Task) -> list[dict]:
         client_places = obj.client_places.all()
-        return [ClientPlaceSchema.from_orm(client_place).dict() for client_place in client_places] if client_places else []
+        return [ClientPlaceSchema.from_orm(client_place).dict() for client_place in
+                client_places] if client_places else []
 
     @staticmethod
     def resolve_client_machines(obj: Task) -> list[dict]:
         client_machines = obj.client_machines.all()
-        return [ClientMachineSchema.from_orm(client_machine).dict() for client_machine in client_machines] if client_machines else []
+        return [ClientMachineSchema.from_orm(client_machine).dict() for client_machine in
+                client_machines] if client_machines else []
 
     @staticmethod
     def resolve_workers(obj: Task) -> list[dict]:
