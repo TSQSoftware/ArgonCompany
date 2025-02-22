@@ -158,18 +158,24 @@ if %SKIP_LICENSE%==0 (
     if not "!APP_PORT!"=="" echo PORT=!APP_PORT! >> "%ENV_FILE%"
 )
 
-echo Running Django migrations...
-python manage.py migrate
 
-echo Starting application...
-if exist address.txt (
-    set /p SERVER_ADDRESS=<address.txt
-) else (
-    set SERVER_ADDRESS=0.0.0.0
+:: ======== MIGRATIONS ========
+echo [%time%] Running migrations | tee -a "%LOG_FILE%"
+python manage.py migrate >> "%LOG_FILE%" 2>&1 || (
+    echo [ERROR] Database migrations failed | tee -a "%LOG_FILE%"
+    echo [DEBUG] Check database settings in settings.py | tee -a "%LOG_FILE%"
+    exit /b 1
 )
 
-if "!SERVER_ADDRESS!"=="" set SERVER_ADDRESS=0.0.0.0
-echo [INFO] Launching server at !SERVER_ADDRESS!:%APP_PORT%
-python manage.py runserver !SERVER_ADDRESS!:%APP_PORT%
+:: ======== FINAL STARTUP ========
+echo [%time%] Starting application | tee -a "%LOG_FILE%"
+python manage.py runserver 0.0.0.0:%APP_PORT% >> "%LOG_FILE%" 2>&1 || (
+    echo [ERROR] Failed to start server | tee -a "%LOG_FILE%"
+    echo [DEBUG] Check if port %APP_PORT% is available | tee -a "%LOG_FILE%"
+    exit /b 1
+)
 
-exit /b 0
+:: Keep window open after completion
+echo [%time%] Installation completed successfully | tee -a "%LOG_FILE%"
+echo Press any key to exit...
+pause >nul
