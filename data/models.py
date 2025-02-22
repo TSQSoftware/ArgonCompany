@@ -20,8 +20,6 @@ class TaskCategory(models.Model):
     def __str__(self):
         return self.name
 
-from django.db import models
-
 class TagColor(models.TextChoices):
     RED = "ff0000", "Red"
     BLUE = "0000ff", "Blue"

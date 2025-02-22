@@ -34,6 +34,7 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deadline = models.DateTimeField(null=True, blank=True)
+    completion_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.category.name if self.category else ''} | {self.name} [{self.workers.count()} workers]"
@@ -57,3 +58,55 @@ class Task(models.Model):
 
             except ValueError:
                 return None
+
+class TaskNote(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='notes')
+    note = models.TextField()
+    created_by = models.ForeignKey(Worker, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    custom_id = models.CharField(max_length=50, unique=True, blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Task Note"
+        verbose_name_plural = "Task Notes"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        name = f'{self.created_by.first_name} {self.created_by.last_name}' if self.created_by else 'Unknown'
+        return f"Note for Task: {self.task.name} by {name}"
+
+    def save(self, *args, **kwargs):
+        if not self.custom_id:
+            current_year = self.created_at.year
+            note_count = self.task.notes.count() + 1
+            self.custom_id = f"{self.task.id}/{note_count}/{current_year}"
+        super().save(*args, **kwargs)
+
+class TaskAttachment(models.Model):
+    task = models.ForeignKey('Task', on_delete=models.CASCADE, related_name='attachments')
+    worker = models.ForeignKey(Worker, on_delete=models.SET_NULL, null=True, blank=True, related_name='task_attachments')
+    file = models.FileField(upload_to='task_attachments/', blank=True, null=True)
+    image = models.ImageField(upload_to='task_images/', blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    attachment_type = models.CharField(
+        max_length=20,
+        choices=[('image', 'Image'), ('file', 'File')],
+        default='file'
+    )
+    custom_id = models.CharField(max_length=50, unique=True, blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Task Attachment"
+        verbose_name_plural = "Task Attachments"
+
+    def __str__(self):
+        return f"Attachment {self.custom_id} for Task {self.task.id}"
+
+    def save(self, *args, **kwargs):
+        if not self.custom_id:
+            current_year = self.created_at.year
+            attachment_count = self.task.attachments.count() + 1
+            self.custom_id = f"{self.task.id}/{attachment_count}/{current_year}"
+        super().save(*args, **kwargs)

@@ -1,4 +1,5 @@
 from django.db import models
+from location_field.forms.plain import PlainLocationField
 
 from data.models import TaskCategory
 
@@ -67,8 +68,7 @@ class ClientPlace(models.Model):
     contact_email = models.EmailField(blank=True, null=True)
     contact_phone = models.CharField(max_length=20, blank=True, null=True)
     place_type = models.CharField(max_length=50, choices=ClientPlaceType.choices, blank=True, null=True)
-    latitude = models.FloatField(blank=True, null=True)
-    longitude = models.FloatField(blank=True, null=True)
+    location = PlainLocationField(based_fields=['latitude', 'longitude'], zoom=7, null=True, blank=True)
     operating_hours = models.TextField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

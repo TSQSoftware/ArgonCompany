@@ -1,11 +1,14 @@
 import uuid
 
 from django.db import models
+from location_field.forms.plain import PlainLocationField
+
 
 class WorkerRole(models.TextChoices):
     WORKER = "worker", "Worker"
     MOD = "mod", "Moderator"
     ADMIN = "admin", "Administrator"
+
 
 class Worker(models.Model):
     first_name = models.CharField(max_length=50)
@@ -25,13 +28,13 @@ class Worker(models.Model):
         self.save()
         return self.activation_key
 
+
 class WorkerLocation(models.Model):
     worker = models.ForeignKey(Worker, on_delete=models.SET_NULL, null=True, blank=True)
     timestamp = models.DateTimeField()
     altitude = models.FloatField(blank=True, null=True)
     speed = models.FloatField(blank=True, null=True)
-    longitude = models.FloatField()
-    latitude = models.FloatField()
+    location = PlainLocationField(based_fields=['latitude', 'longitude'], zoom=7)
 
     def __str__(self):
-        return f"{self.timestamp} {self.altitude} {self.speed} {self.longitude} {self.latitude}"
+        return f"{self.timestamp} {self.altitude} {self.speed} {self.location}"

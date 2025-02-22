@@ -3,6 +3,7 @@ from uuid import uuid4
 
 import jwt
 from django.http import JsonResponse
+from geopy import Point
 from ninja import Router
 
 from argon_company import settings
@@ -89,8 +90,16 @@ def delete_worker(request, worker_id: int):
 
 @router.post('/location', auth=worker_auth, response=WorkerLocationSchema)
 def post_location(request, payload: WorkerLocationCreateSchema):
-    worker = request.worker
+    try:
+        worker = request.worker
 
-    worker_location = WorkerLocation.objects.create(worker=worker, **payload.dict())
-
-    return worker_location
+        worker_location = WorkerLocation.objects.create(
+            worker=worker,
+            timestamp=payload.timestamp,
+            altitude=payload.altitude,
+            speed=payload.speed,
+            location=Point(payload.longitude, payload.latitude)
+        )
+        return worker_location
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
