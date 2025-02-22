@@ -83,7 +83,7 @@ class TaskNote(models.Model):
         if not self.custom_id:
             current_year = (self.created_at if self.created_at else datetime.now()).year
             notes_count = self.task.notes.count() + 1
-            custom_id = f"/{notes_count}/{self.task.id}/{current_year}"
+            custom_id = f"{notes_count}/{self.task.id}/{current_year}"
 
             while self.__class__.objects.filter(custom_id=custom_id).exists():
                 notes_count += 1
@@ -120,7 +120,7 @@ class TaskAttachment(models.Model):
         if not self.custom_id:
             current_year = (self.created_at if self.created_at else datetime.now()).year
             attachment_count = self.task.attachments.count() + 1
-            custom_id = f"/{attachment_count}/{self.task.id}/{current_year}"
+            custom_id = f"{attachment_count}/{self.task.id}/{current_year}"
 
             while self.__class__.objects.filter(custom_id=custom_id).exists():
                 attachment_count += 1
