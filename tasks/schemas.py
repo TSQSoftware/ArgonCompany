@@ -7,12 +7,28 @@ from worker.schemas import SimpleWorkerSchema
 
 
 class TaskNoteSchema(ModelSchema):
+    worker: dict | None
+
+    @staticmethod
+    def resolve_worker(obj: TaskNote) -> dict | None:
+        if obj.worker is None:
+            return None
+        return SimpleWorkerSchema.from_orm(obj.worker).dict()
+
     class Meta:
         model = TaskNote
         fields = '__all__'
 
 
 class TaskAttachmentSchema(ModelSchema):
+    worker: dict | None
+
+    @staticmethod
+    def resolve_worker(obj: TaskNote) -> dict | None:
+        if obj.worker is None:
+            return None
+        return SimpleWorkerSchema.from_orm(obj.worker).dict()
+
     class Meta:
         model = TaskAttachment
         fields = '__all__'

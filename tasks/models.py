@@ -65,7 +65,7 @@ class Task(models.Model):
 class TaskNote(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='notes')
     note = models.TextField()
-    created_by = models.ForeignKey(Worker, on_delete=models.SET_NULL, null=True, blank=True)
+    worker = models.ForeignKey(Worker, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     custom_id = models.CharField(max_length=50, unique=True, blank=True, null=True)
@@ -76,7 +76,7 @@ class TaskNote(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        name = f'{self.created_by.first_name} {self.created_by.last_name}' if self.created_by else 'Unknown'
+        name = f'{self.worker.first_name} {self.worker.last_name}' if self.worker else 'Unknown'
         return f"Note [{self.custom_id}] for Task: {self.task.name} by {name}"
 
     def save(self, *args, **kwargs):
