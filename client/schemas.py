@@ -1,4 +1,7 @@
+from typing import List
+
 from ninja import ModelSchema
+from pydantic import Field
 
 from client.models import Client, ClientMachine, ClientPlace
 from data.schemas import TaskCategorySchema
@@ -18,18 +21,6 @@ class ClientSchema(ModelSchema):
         fields = '__all__'
 
 
-class ClientPlaceSchema(ModelSchema):
-    client_machines: list[dict]
-
-    @staticmethod
-    def resolve_machines(obj: ClientPlace) -> list[dict]:
-        return [ClientMachineSchema.from_orm(machine).model_dump() for machine in obj.machines.all()]
-
-    class Meta:
-        model = ClientPlace
-        fields = '__all__'
-
-
 class ClientMachineSchema(ModelSchema):
     category: dict
 
@@ -39,4 +30,16 @@ class ClientMachineSchema(ModelSchema):
 
     class Meta:
         model = ClientMachine
+        fields = '__all__'
+
+
+class ClientPlaceSchema(ModelSchema):
+    client_machines: List[ClientMachineSchema] = Field(default_factory=list)
+
+    @staticmethod
+    def resolve_client_machines(obj: ClientPlace) -> List[ClientMachineSchema]:
+        return [ClientMachineSchema.from_orm(machine) for machine in obj.machines.all()]
+
+    class Meta:
+        model = ClientPlace
         fields = '__all__'
