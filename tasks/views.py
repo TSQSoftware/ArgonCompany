@@ -1,8 +1,8 @@
 from django.http import JsonResponse
 from ninja import Router
 
-from tasks.models import Task, TaskStatus
-from tasks.schemas import TaskSchema
+from tasks.models import Task, TaskStatus, TaskNote
+from tasks.schemas import TaskSchema, TaskNoteSchema
 from worker.models import WorkerRole
 from worker.worker_auth import worker_auth
 
@@ -61,5 +61,22 @@ def set_status(request, task_id: int, status: TaskStatus):
 
     task.status = status
     task.save()
+
+    return task
+
+@router.post('/task/{task_id}/note/create', response=TaskSchema, auth=worker_auth)
+def add_note(request, task_id: int, note: str):
+    worker = request.worker
+
+    try:
+        task = Task.objects.get(id=task_id)
+    except Task.DoesNotExist:
+        return JsonResponse({'error': 'Task not found'}, status=404)
+
+    if not task.workers.filter(workers__in=[worker]).exists():
+        return JsonResponse({'error': 'Worker not authorized'}, status=401)
+
+    task_note = TaskNote(task=task, note=note, worker=worker)
+    task_note.save()
 
     return task
