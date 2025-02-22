@@ -5,51 +5,46 @@ setlocal EnableDelayedExpansion
 :: ==============================
 :: CONFIGURATION
 :: ==============================
-set REPO_URL=https://github.com/TSQSoftware/ArgonCompany.git
-set FOLDER=ArgonCompany
-set PYTHON_URL=https://www.python.org/ftp/python/3.11.6/python-3.11.6-embed-amd64.zip
-set PYTHON_FOLDER=python_embed
-set VENV_FOLDER=.venv
-set ENV_FILE=.env
-set LICENSE_SERVER=http://dswcsogwc84o4so88osk088c.57.129.132.234.sslip.io/api/v1/license/activate
-set SKIP_LICENSE=0
-set APP_PORT=8000
-set GIT_INSTALLER_URL=https://github.com/git-for-windows/git/releases/download/v2.45.1.windows.1/Git-2.45.1-64-bit.exe
-set ADMIN_NEEDED_FILE=admin_needed.flg
+set "REPO_URL=https://github.com/TSQSoftware/ArgonCompany.git"
+set "FOLDER=ArgonCompany"
+set "PYTHON_URL=https://www.python.org/ftp/python/3.11.6/python-3.11.6-embed-amd64.zip"
+set "PYTHON_FOLDER=python_embed"
+set "VENV_FOLDER=.venv"
+set "ENV_FILE=.env"
+set "LICENSE_SERVER=http://dswcsogwc84o4so88osk088c.57.129.132.234.sslip.io/api/v1/license/activate"
+set "APP_PORT=8000"
+set "GIT_INSTALLER_URL=https://github.com/git-for-windows/git/releases/download/v2.45.1.windows.1/Git-2.45.1-64-bit.exe"
 
 :: ==============================
 :: ELEVATE TO ADMIN IF NEEDED
 :: ==============================
-if exist "%ADMIN_NEEDED_FILE%" (
-    del "%ADMIN_NEEDED_FILE%"
-    goto INSTALL_GIT
-)
+NET FILE >nul 2>&1
+if %errorlevel% equ 0 (set "ADMIN=1") else (set "ADMIN=0")
 
-:: Check admin privileges
-net session >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Creating temporary admin request flag...
-    echo. > "%ADMIN_NEEDED_FILE%"
+if %ADMIN% equ 0 (
     echo Requesting administrator privileges...
-    powershell -Command "Start-Process cmd -ArgumentList '/c cd /d \"%CD%\" && %0' -Verb RunAs"
+    powershell -Command "Start-Process '%~f0' -Verb RunAs"
     exit /b
 )
 
 :INSTALL_GIT
-where git >nul 2>nul
-if %errorlevel% neq 0 (
+where git >nul 2>nul || (
     echo Installing Git...
-    powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%GIT_INSTALLER_URL%' -OutFile 'git-installer.exe'"
-    if exist git-installer.exe (
-        git-installer.exe /VERYSILENT /NORESTART /NOCANCEL /SP- /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /COMPONENTS="ext,ext\reg\system,ext\reg\user,assoc,assoc_sh"
-        del git-installer.exe
-        set PATH=%PATH%;C:\Program Files\Git\cmd
+    powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%GIT_INSTALLER_URL%' -OutFile 'git_installer.exe'"
+    if exist "git_installer.exe" (
+        start /wait "" "git_installer.exe" /VERYSILENT /NORESTART /NOCANCEL /SP- /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS
+        timeout /t 5 >nul
+        del "git_installer.exe"
     )
+    set "PATH=%PATH%;C:\Program Files\Git\cmd"
 )
+
 
 :: ==============================
 :: MAIN SCRIPT
 :: ==============================
+pushd "%~dp0"
+
 if exist "%FOLDER%\%ENV_FILE%" (
     echo [INFO] Existing installation detected, skipping license check...
     set SKIP_LICENSE=1
