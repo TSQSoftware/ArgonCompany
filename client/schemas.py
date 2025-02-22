@@ -22,10 +22,9 @@ class ClientPlaceSchema(ModelSchema):
     client_machines: list[dict]
 
     @staticmethod
-    def resolve_client_machines(obj: ClientPlace) -> list[dict]:
-        client_machines = obj.client_machines.all()
-        return [ClientMachineSchema.from_orm(client_machine).dict() for client_machine in
-                client_machines] if client_machines else []
+    def resolve_machines(obj: ClientPlace) -> list[dict]:
+        machines = obj.machines.all()
+        return [ClientMachineSchema.from_orm(machine).dict() for machine in machines] if machines.exists() else []
 
     class Meta:
         model = ClientPlace

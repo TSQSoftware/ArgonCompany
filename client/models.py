@@ -113,4 +113,4 @@ class Client(models.Model):
         verbose_name_plural = 'Clients'
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.short_name})" if self.short_name else self.name
