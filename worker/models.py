@@ -1,7 +1,7 @@
 import uuid
 
 from django.db import models
-from location_field.forms.plain import PlainLocationField
+from location_field.models.plain import PlainLocationField
 
 
 class WorkerRole(models.TextChoices):
