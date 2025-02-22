@@ -87,7 +87,7 @@ class TaskNote(models.Model):
 
             while self.__class__.objects.filter(custom_id=custom_id).exists():
                 notes_count += 1
-                custom_id = f"/{notes_count}/{self.task.id}/{current_year}"
+                custom_id = f"{notes_count}/{self.task.id}/{current_year}"
 
             self.custom_id = custom_id
 
@@ -124,7 +124,7 @@ class TaskAttachment(models.Model):
 
             while self.__class__.objects.filter(custom_id=custom_id).exists():
                 attachment_count += 1
-                custom_id = f"/{attachment_count}/{self.task.id}/{current_year}"
+                custom_id = f"{attachment_count}/{self.task.id}/{current_year}"
 
             self.custom_id = custom_id
 
