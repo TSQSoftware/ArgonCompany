@@ -1,5 +1,5 @@
-from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
@@ -15,4 +15,5 @@ class Command(BaseCommand):
         user.is_active = True
         user.save()
 
-        self.stdout.write(self.style.SUCCESS("Superuser 'admin' created with password 'admin'. Please change the password immediately."))
+        self.stdout.write(self.style.SUCCESS(
+            "Superuser 'admin' created with password 'admin'. Please change the password immediately."))

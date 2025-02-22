@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 from geopy import Nominatim
 from geopy.exc import GeocoderTimedOut
@@ -78,7 +80,7 @@ class TaskNote(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.custom_id:
-            current_year = self.created_at.year
+            current_year = (self.created_at if self.created_at else datetime.now()).year
             note_count = self.task.notes.count() + 1
             self.custom_id = f"{self.task.id}/{note_count}/{current_year}"
         super().save(*args, **kwargs)
@@ -106,7 +108,7 @@ class TaskAttachment(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.custom_id:
-            current_year = self.created_at.year
+            current_year = (self.created_at if self.created_at else datetime.now()).year
             attachment_count = self.task.attachments.count() + 1
             self.custom_id = f"{self.task.id}/{attachment_count}/{current_year}"
         super().save(*args, **kwargs)
