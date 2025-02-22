@@ -76,13 +76,13 @@ class TaskNote(models.Model):
 
     def __str__(self):
         name = f'{self.created_by.first_name} {self.created_by.last_name}' if self.created_by else 'Unknown'
-        return f"Note for Task: {self.task.name} by {name}"
+        return f"Note [{self.custom_id}] for Task: {self.task.name} by {name}"
 
     def save(self, *args, **kwargs):
         if not self.custom_id:
             current_year = (self.created_at if self.created_at else datetime.now()).year
             note_count = self.task.notes.count() + 1
-            self.custom_id = f"{self.task.id}/{note_count}/{current_year}"
+            self.custom_id = f"{note_count}/{self.task.id}/{current_year}"
         super().save(*args, **kwargs)
 
 class TaskAttachment(models.Model):
@@ -110,5 +110,5 @@ class TaskAttachment(models.Model):
         if not self.custom_id:
             current_year = (self.created_at if self.created_at else datetime.now()).year
             attachment_count = self.task.attachments.count() + 1
-            self.custom_id = f"{self.task.id}/{attachment_count}/{current_year}"
+            self.custom_id = f"/{attachment_count}/{self.task.id}/{current_year}"
         super().save(*args, **kwargs)
