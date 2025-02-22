@@ -73,7 +73,7 @@ def add_note(request, task_id: int, note: str):
     except Task.DoesNotExist:
         return JsonResponse({'error': 'Task not found'}, status=404)
 
-    if not task.workers.filter(workers__in=[worker]).exists():
+    if not task.workers.filter(id=worker.id).exists():
         return JsonResponse({'error': 'Worker not authorized'}, status=401)
 
     task_note = TaskNote(task=task, note=note, worker=worker)
