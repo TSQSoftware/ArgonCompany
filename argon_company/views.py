@@ -54,8 +54,8 @@ def health_check(request):
 
     try:
         from tasks.models import Task
-        health_status["myapp_model_count"] = Task.objects.count()
+        health_status["task_model_count"] = Task.objects.count()
     except Exception as e:
-        health_status["myapp_model_error"] = str(e)
+        health_status["task_model_error"] = str(e)
 
     return health_status
