@@ -3,12 +3,13 @@ import shutil
 
 import psutil
 from django.apps import apps
-from django.conf import settings
 from django.core.cache import cache
 from django.core.mail import get_connection
 from django.db import connection
 from ninja import Router
 from ninja.throttling import AnonRateThrottle
+
+from argon_company import settings
 
 router = Router()
 
@@ -57,5 +58,7 @@ def health_check(request):
         health_status["task_model_count"] = Task.objects.count()
     except Exception as e:
         health_status["task_model_error"] = str(e)
+
+    health_status['version'] = settings.VERSION
 
     return health_status
