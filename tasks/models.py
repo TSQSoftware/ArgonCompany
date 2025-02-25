@@ -51,7 +51,7 @@ class Task(models.Model):
                 geolocator = Nominatim(user_agent="myGeocoder")
 
                 try:
-                    location = geolocator.reverse((lat, lon), language='pl', timeout=1)
+                    location = geolocator.reverse((lat, lon), language='pl', timeout=10)
                     return location.address if location else None
                 except GeocoderTimedOut:
                     return None
@@ -60,6 +60,12 @@ class Task(models.Model):
 
             except ValueError:
                 return None
+
+    def get_contact_info(self):
+        if self.contact_phone_number is None:
+            return None
+
+        return self.contact_phone_number
 
 
 class TaskNote(models.Model):

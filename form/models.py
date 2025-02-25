@@ -1,7 +1,8 @@
-from django.db import models
 from django.core.exceptions import ValidationError
+from django.db import models
 
 from worker.models import Worker
+
 
 class Form(models.Model):
     name = models.CharField(max_length=255)
@@ -9,6 +10,24 @@ class Form(models.Model):
 
     def __str__(self):
         return f"Form: {self.name} (Workers: {self.workers.count()})"
+
+
+class QuestionCategory(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Category Name")
+    description = models.TextField(blank=True, null=True)
+    order = models.PositiveIntegerField(default=0, help_text="Display order in forms and reports")
+    show_in_table = models.BooleanField(default=False,
+                                        help_text="Display questions in this category as table rows")
+    columns = models.JSONField(default=list, blank=True,
+                               help_text="JSON list of column names for table display")
+
+    class Meta:
+        verbose_name_plural = "Categories"
+        ordering = ['order']
+
+    def __str__(self):
+        return self.name
+
 
 class Question(models.Model):
     TEXT = 'text'
@@ -26,9 +45,20 @@ class Question(models.Model):
     subtitle = models.CharField(max_length=255, blank=True, null=True)
     question_type = models.CharField(max_length=20, choices=QUESTION_TYPES)
     choices = models.JSONField(default=list, blank=True, null=True)
+    category = models.ForeignKey(QuestionCategory, on_delete=models.SET_NULL, null=True, blank=True,
+                                 related_name='questions')
+    is_header = models.BooleanField(default=False)
+    show_in_table = models.BooleanField(default=False)
+    columns = models.JSONField(default=list, blank=True)
+    depends_on = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,
+                                   related_name='dependent_questions')
+    required = models.BooleanField(default=False)
+    validation_rules = models.JSONField(default=dict, blank=True)  # e.g., {"min_length": 5, "max_length": 100}
+    score = models.IntegerField(default=0, blank=True)
+    parent_question = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,
+                                        related_name='sub_questions')
+    media_url = models.URLField(blank=True, null=True)  # For images, videos, or audio
 
-    def __str__(self):
-        return f"Question: {self.title} ({self.get_question_type_display()}) in Form: {self.form.name}"
 
 class FormAnswer(models.Model):
     form = models.ForeignKey(Form, on_delete=models.CASCADE, related_name='answers')
@@ -37,6 +67,7 @@ class FormAnswer(models.Model):
 
     def __str__(self):
         return f"FormAnswer: {self.form.name} by {self.worker.first_name} {self.worker.last_name} on {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
+
 
 class Answer(models.Model):
     form_answer = models.ForeignKey(FormAnswer, on_delete=models.CASCADE, related_name='answers')
@@ -72,3 +103,8 @@ class Answer(models.Model):
 
     def __str__(self):
         return f"Answer to '{self.question.title}' by {self.form_answer.worker.first_name} {self.form_answer.worker.last_name} in Form '{self.form_answer.form.name}'"
+
+    def formatted_answer(self):
+        if self.question.question_type == Question.MULTIPLE_CHOICE:
+            return ", ".join(self.multiple_choice_answer)
+        return self.text_answer or self.single_choice_answer or ""

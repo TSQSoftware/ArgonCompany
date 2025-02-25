@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INSTALACJA PROTOKÓŁ SERWISOWY - Protokół</title>
+    <style>
+        @font-face {
+            font-family: 'DejaVu Sans';
+            src: url('/Users/karolgajda/PycharmProjects/ArgonCompany/staticfiles/fonts/DejaVuSans.ttf');
+        }
+
+        @font-face {
+            font-family: 'DejaVu Sans Bold';
+            src: url('/Users/karolgajda/PycharmProjects/ArgonCompany/staticfiles/fonts/DejaVuSans-Bold.ttf');
+        }
+
+        body {
+            font-family: 'DejaVu Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.8;
+            background-color: #ffffff;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 40px;
+        }
+
+        header {
+            text-align: center;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #2c3e50;
+        }
+
+        header img {
+            max-width: 180px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-family: 'DejaVu Sans Bold', sans-serif;
+            font-size: 28px;
+            color: #2c3e50;
+            margin: 15px 0;
+            text-transform: uppercase;
+        }
+
+        .protocol-date {
+            text-align: right;
+            margin-bottom: 30px;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .protocol-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+        }
+
+        .protocol-table td {
+            padding: 15px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+
+        .question-cell {
+            width: 55%;
+            font-weight: bold;
+            background-color: #f8f9fa;
+            border-right: none;
+        }
+
+        .answer-cell {
+            width: 45%;
+            border-left: none;
+            position: relative;
+        }
+
+        .answer-content {
+            border-bottom: 2px dotted #666;
+            min-height: 24px;
+            padding: 4px 0;
+        }
+
+        .sub-question {
+            padding-left: 30px;
+            font-size: 0.95em;
+            color: #444;
+        }
+
+        .subtitle {
+            font-size: 0.9em;
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .category-header {
+            background-color: #f5f5f5;
+            border-bottom: 2px solid #2c3e50;
+        }
+
+        .category-header h3 {
+            font-family: 'DejaVu Sans Bold', sans-serif;
+            font-size: 20px;
+            margin: 15px 0 5px;
+            color: #2c3e50;
+        }
+
+        .category-description {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .inner-table {
+            width: 100%;
+            margin: 15px 0;
+            border-collapse: collapse;
+        }
+
+        .inner-table th,
+        .inner-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .inner-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .signature-section {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .signature-box {
+            width: 45%;
+            margin-top: 40px;
+        }
+
+        .signature-line {
+            border-bottom: 2px solid #000;
+            width: 80%;
+            margin: 20px 0;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        .media-attachment {
+            margin-top: 15px;
+            max-width: 200px;
+            border: 1px solid #ddd;
+            padding: 5px;
+        }
+
+        .task-details {
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            border-left: 5px solid #2c3e50;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-details p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .task-details strong {
+            color: #2c3e50;
+            font-family: 'DejaVu Sans Bold', sans-serif;
+        }
+
+        .avoid-page-break {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <img src="/Users/karolgajda/PycharmProjects/ArgonCompany/staticfiles/assets/logo.png" alt="Logo Firmy">
+        <h1>INSTALACJA PROTOKÓŁ SERWISOWY - Protokół</h1>
+        <p>Biedronka, 41, aleja Armii Krajowej, Gaj, Wrocław, województwo dolnośląskie, 50-541, Polska</p>
+    </header>
+
+    <div class="protocol-date">Data: 25.02.2025</div>
+
+    <table class="protocol-table">
+        
+            <tr class="category-header">
+                <td colspan="2">
+                    <h3>PODSTAWOWE INFORMACJE</h3>
+                    
+                </td>
+            </tr>
+
+            
+                
+                    <tr class="avoid-page-break">
+                        <td class="question-cell">
+                            Miejsce
+                            
+                            
+                        </td>
+                        <td class="answer-cell">
+                            <div class="answer-content">
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    
+                
+                    <tr class="avoid-page-break">
+                        <td class="question-cell">
+                            Data
+                            
+                            
+                        </td>
+                        <td class="answer-cell">
+                            <div class="answer-content">
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    
+                
+                    <tr class="avoid-page-break">
+                        <td class="question-cell">
+                            Typ serwisu
+                            <span class="subtitle">Serwis / Instalacja / Naprawa</span>
+                            
+                        </td>
+                        <td class="answer-cell">
+                            <div class="answer-content">
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    
+                
+            
+        
+            <tr class="category-header">
+                <td colspan="2">
+                    <h3>URZĄDZENIE</h3>
+                    <p class="category-description">Dokładnie sprecyzowane urządzenie wraz z typem, producentem i numerem seryjnym</p>
+                </td>
+            </tr>
+
+            
+                
+                    <tr class="avoid-page-break">
+                        <td class="question-cell">
+                            Urządzenie
+                            
+                            
+                        </td>
+                        <td class="answer-cell">
+                            <div class="answer-content">
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    
+                
+                    <tr class="avoid-page-break">
+                        <td class="question-cell">
+                            Typ
+                            <span class="subtitle">Klimatyzacja / Pompa ciepła</span>
+                            
+                        </td>
+                        <td class="answer-cell">
+                            <div class="answer-content">
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    
+                
+                    <tr class="avoid-page-break">
+                        <td class="question-cell">
+                            Producent
+                            
+                            
+                        </td>
+                        <td class="answer-cell">
+                            <div class="answer-content">
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    
+                
+                    <tr class="avoid-page-break">
+                        <td class="question-cell">
+                            Numer seryjny
+                            
+                            
+                        </td>
+                        <td class="answer-cell">
+                            <div class="answer-content">
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    
+                
+            
+        
+            <tr class="category-header">
+                <td colspan="2">
+                    <h3>DANE WYKONAWCY MONTAŻU</h3>
+                    
+                </td>
+            </tr>
+
+            
+                
+                    <tr class="avoid-page-break">
+                        <td class="question-cell">
+                            Nazwa firmy
+                            
+                            
+                        </td>
+                        <td class="answer-cell">
+                            <div class="answer-content">
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    
+                
+                    <tr class="avoid-page-break">
+                        <td class="question-cell">
+                            NIP
+                            
+                            
+                        </td>
+                        <td class="answer-cell">
+                            <div class="answer-content">
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    
+                
+                    <tr class="avoid-page-break">
+                        <td class="question-cell">
+                            Adres
+                            
+                            
+                        </td>
+                        <td class="answer-cell">
+                            <div class="answer-content">
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    
+                
+            
+        
+            <tr class="category-header">
+                <td colspan="2">
+                    <h3>DANE NABYWCY</h3>
+                    <p class="category-description">Do faktury - nazwa i siedziba, osoba kontaktowa, telefon</p>
+                </td>
+            </tr>
+
+            
+                
+                    <tr class="avoid-page-break">
+                        <td class="question-cell">
+                            Dane
+                            
+                            
+                        </td>
+                        <td class="answer-cell">
+                            <div class="answer-content">
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    
+                
+            
+        
+            <tr class="category-header">
+                <td colspan="2">
+                    <h3>UWAGI</h3>
+                    
+                </td>
+            </tr>
+
+            
+                
+                    <tr class="avoid-page-break">
+                        <td class="question-cell">
+                            .
+                            
+                            
+                        </td>
+                        <td class="answer-cell">
+                            <div class="answer-content">
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    
+                
+            
+        
+    </table>
+
+    <div class="task-details avoid-page-break">
+        <p><strong>Task ID:</strong> 485</p>
+        <p><strong>Description:</strong> </p>
+        <p><strong>Assigned To:</strong> Marcin Dąbrówka, Marcin Jerzy</p>
+        <p><strong>Due Date:</strong> 25.02.2025</p>
+        <p><strong>Status:</strong> completed</p>
+        <p><strong>Client Name:</strong> N/A</p>
+        <p><strong>Task Type:</strong> None</p>
+        <p><strong>Task Notes:</strong> tasks.TaskNote.None</p>
+        <p><strong>Completion Date:</strong> 25.02.2025</p>
+    </div>
+
+    <div class="signature-section avoid-page-break">
+        <div class="signature-box">
+            <p>Podpis Klienta:</p>
+            <div class="signature-line"></div>
+        </div>
+
+        <div class="signature-box">
+            <p>Podpis przedstawiciela usług:</p>
+            <div class="signature-line"></div>
+        </div>
+    </div>
+
+    <div class="footer-note avoid-page-break">
+        <p>Dokument został wygenerowany automatycznie (25.02.2025 17:22). Dziękujemy za skorzystanie z naszych usług.</p>
+        <p>W przypadku jakichkolwiek pytań, prosimy o kontakt: 502-102-402</p>
+    </div>
+</div>
+</body>
+</html>
