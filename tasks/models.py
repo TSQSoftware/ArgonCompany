@@ -10,12 +10,15 @@ from data.models import Tag, TaskCategory
 from worker.models import Worker
 
 
-class TaskStatus(models.TextChoices):
-    IN_PROGRESS = 'in_progress', 'In progress'
-    COMPLETED = 'completed', 'Completed'
-    CANCELLED = 'cancelled', 'Cancelled'
-    NOT_STARTED = 'not_started', 'Not started'
-    AWAITING_CONFIRMATION = 'awaiting_confirmation', 'Awaiting confirmation'
+class TaskStatus(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    require_confirmation = models.BooleanField(default=False)
+
+    class Config:
+        arbitrary_types_allowed = True
+
+    def __str__(self):
+        return self.name
 
 
 class Task(models.Model):
@@ -26,7 +29,7 @@ class Task(models.Model):
     description = models.TextField(null=True, blank=True)
     workers = models.ManyToManyField(Worker, blank=True)
     location = PlainLocationField(based_fields=['latitude', 'longitude'], zoom=7, null=True, blank=True)
-    status = models.CharField(choices=TaskStatus.choices, default=TaskStatus.NOT_STARTED, max_length=50)
+    status = models.ForeignKey(TaskStatus, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks')
     expected_realization_duration = models.DurationField(null=True, blank=True)
     expected_realization_date = models.DateField(null=True, blank=True)
     tags = models.ManyToManyField(Tag, blank=True)
@@ -57,15 +60,11 @@ class Task(models.Model):
                     return None
                 except Exception:
                     return None
-
             except ValueError:
                 return None
 
     def get_contact_info(self):
-        if self.contact_phone_number is None:
-            return None
-
-        return self.contact_phone_number
+        return self.contact_phone_number or None
 
 
 class TaskNote(models.Model):

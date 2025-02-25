@@ -3,11 +3,12 @@ import uuid
 from django.db import models
 from location_field.models.plain import PlainLocationField
 
+from data.models import UserRole
 
-class WorkerRole(models.TextChoices):
-    WORKER = "worker", "Worker"
-    MOD = "mod", "Moderator"
-    ADMIN = "admin", "Administrator"
+
+def get_default_user_role():
+    """Returns the user role with the lowest permission level"""
+    return UserRole.objects.first()
 
 
 class Worker(models.Model):
@@ -18,7 +19,7 @@ class Worker(models.Model):
     is_active = models.BooleanField(default=True)
     activation_key = models.CharField(max_length=36, null=True, blank=True)
     uuid = models.UUIDField(null=True, blank=True)
-    role = models.CharField(max_length=50, choices=WorkerRole.choices, default=WorkerRole.WORKER)
+    role = models.ForeignKey(UserRole, on_delete=models.SET_DEFAULT, default=get_default_user_role)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"

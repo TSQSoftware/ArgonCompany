@@ -2,6 +2,39 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 
 
+class UserRoleFeature(models.TextChoices):
+    CHANGE_BASIC_TASK_STATUS = "change_basic_task_status", "Change basic task status"
+    CHANGE_ALL_TASK_STATUS = "change_all_task_status", "Change all task status"
+    DELETE_TASK = "delete_task", "Delete Task"
+    EDIT_TASK = "edit_task", "Edit Task"
+
+
+class Feature(models.Model):
+    code = models.CharField(
+        max_length=50, choices=UserRoleFeature.choices, unique=True
+    )
+
+    def __str__(self):
+        return self.get_code_display()
+
+    @staticmethod
+    def get_worker_features() -> list:
+        return [
+            Feature.objects.filter(code='change_basic_task_status').get(),
+        ]
+
+
+class UserRole(models.Model):
+    name = models.CharField(unique=True, max_length=50)
+    features = models.ManyToManyField(Feature, blank=True)
+
+    def has_feature(self, feature_code: str) -> bool:
+        return self.features.filter(code=feature_code).exists()
+
+    def __str__(self):
+        return self.name
+
+
 class TaskCategory(models.Model):
     name = models.CharField(max_length=100)
     icon = models.ImageField(
@@ -20,6 +53,7 @@ class TaskCategory(models.Model):
     def __str__(self):
         return self.name
 
+
 class TagColor(models.TextChoices):
     RED = "ff0000", "Red"
     BLUE = "0000ff", "Blue"
@@ -34,6 +68,7 @@ class TagColor(models.TextChoices):
     CYAN = "00ffff", "Cyan"
     MAGENTA = "ff00ff", "Magenta"
     BROWN = "a52a2a", "Brown"
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=100)

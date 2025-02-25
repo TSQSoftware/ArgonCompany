@@ -4,7 +4,7 @@ from typing import Optional
 from ninja import ModelSchema, Schema
 
 from argon_company import settings
-from worker.models import Worker, WorkerRole, WorkerLocation
+from worker.models import Worker, WorkerLocation
 
 
 class WorkerSchema(ModelSchema):
@@ -36,7 +36,7 @@ class WorkerCreateSchema(Schema):
     last_name: str
     date_of_birth: Optional[date] = None
     phone_number: Optional[str] = None
-    role: Optional[WorkerRole] = None
+    role: Optional[str] = None
 
 
 class WorkerUpdateSchema(Schema):
@@ -44,7 +44,7 @@ class WorkerUpdateSchema(Schema):
     last_name: str = None
     date_of_birth: Optional[date] = None
     phone_number: Optional[str] = None
-    role: Optional[WorkerRole] = None
+    role: Optional[str] = None
 
 class WorkerLocationSchema(ModelSchema):
     class Meta:

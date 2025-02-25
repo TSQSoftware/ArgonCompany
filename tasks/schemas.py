@@ -1,4 +1,4 @@
-from ninja import ModelSchema, Schema
+from ninja import ModelSchema
 
 from client.schemas import ClientSchema, ClientPlaceSchema, ClientMachineSchema
 from data.schemas import TaskCategorySchema, TagSchema
@@ -32,11 +32,6 @@ class TaskAttachmentSchema(ModelSchema):
     class Meta:
         model = TaskAttachment
         fields = '__all__'
-
-
-class TaskTypeUpdateSchema(Schema):
-    name: str = None
-    description: str = None
 
 
 class TaskSchema(ModelSchema):
@@ -96,19 +91,3 @@ class TaskSchema(ModelSchema):
     class Meta:
         model = Task
         fields = '__all__'
-
-
-class TaskCreateSchema(Schema):
-    name: str
-    type_id: int
-    address: str
-    contact_phone_number: str
-    description: str
-
-
-class TaskUpdateSchema(Schema):
-    name: str = None
-    type_id: int = None
-    address: str = None
-    contact_phone_number: str = None
-    description: str = None

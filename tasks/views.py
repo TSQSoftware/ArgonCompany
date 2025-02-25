@@ -2,11 +2,11 @@ from django.http import JsonResponse
 from ninja import Router
 
 from tasks.models import Task, TaskStatus, TaskNote
-from tasks.schemas import TaskSchema, TaskNoteSchema
-from worker.models import WorkerRole
+from tasks.schemas import TaskSchema
 from worker.worker_auth import worker_auth
 
 router = Router()
+
 
 @router.get('/tasks', response=list[TaskSchema])
 def get_tasks(request):
@@ -24,6 +24,7 @@ def get_own_tasks(request):
         return JsonResponse({"error": "Worker not authenticated"}, status=401)
 
     return Task.objects.filter(workers__in=[request.worker.id]).all()
+
 
 @router.get('/task/{task_id}', response=TaskSchema)
 def get_task(request, task_id: int):
@@ -47,11 +48,18 @@ def set_workers(request, task_id: int, workers: list[int]):
 
     return task
 
+
 @router.patch('/task/{task_id}/status', response=TaskSchema, auth=worker_auth)
-def set_status(request, task_id: int, status: TaskStatus):
+def set_status(request, task_id: int, status_name: str):
     worker = request.worker
-    if status == TaskStatus.COMPLETED or status == TaskStatus.CANCELLED:
-        if worker.role == WorkerRole.WORKER:
+
+    try:
+        status = TaskStatus.objects.get(name=status_name)
+    except TaskStatus.DoesNotExist:
+        return JsonResponse({'error': 'Status not found'}, status=404)
+
+    if status.require_confirmation:
+        if not worker.role.features.filter(name='change_all_task_status').exists():
             return JsonResponse({'error': 'Worker not authorized'}, status=401)
 
     try:
@@ -63,6 +71,7 @@ def set_status(request, task_id: int, status: TaskStatus):
     task.save()
 
     return task
+
 
 @router.post('/task/{task_id}/note/create', response=TaskSchema, auth=worker_auth)
 def add_note(request, task_id: int, note: str):
