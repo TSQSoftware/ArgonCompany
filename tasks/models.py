@@ -144,6 +144,4 @@ class TaskAttachment(models.Model):
 
             self.custom_id = custom_id
 
-        if not self.id:
-            super().save(*args, **kwargs)
         super().save(*args, **kwargs)
