@@ -2,13 +2,13 @@ import asyncio
 import os
 from datetime import datetime
 
-from django.conf import settings
 from django.core.files.base import ContentFile
 from django.template import Template, Context
 from django.template.loader import render_to_string
 from django.templatetags.static import static
 from pyppeteer import launch
 
+from argon_company import settings
 from form.models import Form, FormAnswer
 from tasks.models import Task, TaskAttachment
 from worker.models import Worker
@@ -63,8 +63,12 @@ def generate_protocol_pdf(task: Task, form: Form, form_answer: FormAnswer, worke
         'task_notes': task.notes if task.notes else 'No additional notes',
         'completion_date': task.completion_date.strftime("%d.%m.%Y") if task.completion_date else 'N/A',
         'generated_date': datetime.now().strftime("%d.%m.%Y %H:%M"),
-        'client_signature': client_signature.image if client_signature else None,
-        'worker_signature': worker_signature.image if worker_signature else None,
+        'client_signature_url': (
+            os.path.join(settings.MEDIA_ROOT, str(client_signature.image.url).replace(settings.MEDIA_URL, ''))
+        ) if client_signature and client_signature.image else None,
+        'worker_signature_url': (
+            os.path.join(settings.MEDIA_ROOT, str(worker_signature.image.url).replace(settings.MEDIA_URL, ''))
+        ) if worker_signature and worker_signature.image else None,
     }
 
     for index, answer in enumerate(form_answer.answers.all(), start=1):
@@ -95,8 +99,8 @@ def generate_protocol_pdf(task: Task, form: Form, form_answer: FormAnswer, worke
     task_attachment.file = pdf_file
     task_attachment.save()
 
-    if os.path.exists(html_path):
-        os.remove(html_path)
+    # if os.path.exists(html_path):
+    # os.remove(html_path)
 
     return task_attachment
 
