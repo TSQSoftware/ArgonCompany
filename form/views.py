@@ -4,6 +4,7 @@ from ninja import Router
 from form.models import Form, FormAnswer, Question, Answer
 from form.schemas import SimpleFormSchema, FormAnswerSchema, QuestionSchema, AnswerSchema
 from form.pdf_generator import generate_static_template, generate_protocol_pdf
+from tasks.models import Task
 from worker.worker_auth import worker_auth
 
 router = Router()
@@ -29,7 +30,20 @@ def get_form_answer(request, form_id: int, task_id: int):
 def create_form_answer(request, form_id: int, task_id: int):
     worker = request.worker
 
-    answer = FormAnswer.objects.create(worker=worker, form_id=form_id, task_id=task_id)
+    try:
+        form = Form.objects.filter(id=form_id).get()
+    except Form.DoesNotExist:
+        return JsonResponse({'error': 'No such form'}, status=404)
+
+    if not form.workers.filter(id=worker).exists():
+        return JsonResponse({'error': 'No such worker'}, status=404)
+
+    try:
+        task = Task.objects.filter(id=task_id).get()
+    except Task.DoesNotExist:
+        return JsonResponse({'error': 'No such task'}, status=404)
+
+    answer = FormAnswer.objects.create(worker=worker, form=form, task=task)
 
     return answer
 
