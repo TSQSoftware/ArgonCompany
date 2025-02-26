@@ -1,6 +1,5 @@
 from django.http import JsonResponse
 from ninja import Router, UploadedFile, File
-from typing_extensions import Optional
 
 from tasks.models import Task, TaskStatus, TaskNote, TaskAttachment
 from tasks.schemas import TaskSchema, TaskStatusSchema
@@ -98,8 +97,8 @@ def add_note(request, task_id: int, note: str):
 
 
 @router.post('/task/{task_id}/attachment', response=TaskSchema, auth=worker_auth)
-def add_attachment(request, task_id: int, description: Optional[str],
-                   attachment_file: UploadedFile = File(default_factory=list)):
+def add_attachment(request, task_id: int, description: str = None,
+                   attachment_file: UploadedFile = File()):
     worker = request.worker
 
     try:
