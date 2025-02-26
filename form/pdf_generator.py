@@ -44,6 +44,9 @@ def generate_protocol_pdf(task: Task, form: Form, form_answer: FormAnswer, worke
     with open(template_path, "r", encoding="utf-8") as template_file:
         template_content = template_file.read()
 
+    client_signature = task.attachments.filter(type='client_signature').last()
+    worker_signature = task.attachments.filter(type='worker_signature').last()
+
     template = Template(template_content)
     context_data = {
         'form_title': form_answer.form.name,
@@ -60,6 +63,8 @@ def generate_protocol_pdf(task: Task, form: Form, form_answer: FormAnswer, worke
         'task_notes': task.notes if task.notes else 'No additional notes',
         'completion_date': task.completion_date.strftime("%d.%m.%Y") if task.completion_date else 'N/A',
         'generated_date': datetime.now().strftime("%d.%m.%Y %H:%M"),
+        'client_signature': client_signature.image if client_signature else None,
+        'worker_signature': worker_signature.image if worker_signature else None,
     }
 
     for index, answer in enumerate(form_answer.answers.all(), start=1):
@@ -112,6 +117,8 @@ def generate_static_template(form_id: int) -> str:
         'completion_date': "{{ completion_date }}",
         'contact_info': "{{ contact_info }}",
         'generated_date': "{{ generated_date }}",
+        'client_signature_url': "{{ client_signature_url }}",
+        'worker_signature_url': "{{ worker_signature_url }}",
         'font_path': os.path.join(settings.STATIC_ROOT, 'fonts/'),
         'asset_path': os.path.join(settings.STATIC_ROOT, 'assets/'),
         'category_groups': [],

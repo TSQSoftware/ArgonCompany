@@ -149,12 +149,6 @@
             margin-top: 40px;
         }
 
-        .signature-line {
-            border-bottom: 2px solid #000;
-            width: 80%;
-            margin: 20px 0;
-        }
-
         .footer-note {
             text-align: center;
             margin-top: 50px;
@@ -191,6 +185,12 @@
 
         .avoid-page-break {
             page-break-inside: avoid;
+        }
+
+        .signature-image {
+            max-width: 100%;
+            height: auto;
+            display: block;
         }
     </style>
 </head>
@@ -287,17 +287,18 @@
     <div class="signature-section avoid-page-break">
         <div class="signature-box">
             <p>Podpis Klienta:</p>
-            <div class="signature-line"></div>
+            <img src="{{ client_signature_url }}" class="signature-image" alt="Podpis klienta">
         </div>
 
         <div class="signature-box">
             <p>Podpis przedstawiciela usług:</p>
-            <div class="signature-line"></div>
+            <img src="{{ worker_signature_url }}" class="signature-image" alt="Podpis pracownika">
         </div>
     </div>
 
     <div class="footer-note avoid-page-break">
-        <p>Dokument został wygenerowany automatycznie ({{ generated_date }}). Dziękujemy za skorzystanie z naszych usług.</p>
+        <p>Dokument został wygenerowany automatycznie ({{ generated_date }}). Dziękujemy za skorzystanie z naszych
+            usług.</p>
         <p>W przypadku jakichkolwiek pytań, prosimy o kontakt: {{ contact_info }}</p>
     </div>
 </div>
