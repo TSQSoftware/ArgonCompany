@@ -78,7 +78,7 @@ def generate_protocol_pdf(task: Task, form: Form, form_answer: FormAnswer, worke
     task_attachment = TaskAttachment.objects.create(
         task=task,
         worker=worker,
-        description=f"Protokół {worker.first_name} {worker.last_name}",
+        description=f"{worker.first_name} {worker.last_name}\n{form.name}",
         attachment_type="file",
         type='form',
     )
