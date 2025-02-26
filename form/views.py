@@ -1,7 +1,10 @@
+import os
+
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from ninja import Router
 
+from argon_company import settings
 from form.models import Form, FormAnswer, Question, Answer
 from form.pdf_generator import generate_static_template, generate_protocol_pdf
 from form.schemas import SimpleFormSchema, FormAnswerSchema, QuestionSchema, AnswerSchema, AnswerUpdateSchema
@@ -110,16 +113,36 @@ def update_answer(request, form_id: int, task_id: int, question_id: int, data: A
     return answer_obj
 
 
-@router.get('/form/document/{answer_id}')
-def get_form(request, answer_id: int, form_id: int, task_id: int):
-    html_path, pdf_path = generate_protocol_pdf(task_id, form_id, answer_id)
-
-    return JsonResponse({
-        "html_path": html_path,
-        "pdf_path": pdf_path
-    }, )
+@router.post('/form/template/{form_id}')  # FIXME ADMIN AUTH
+def generate_template(request, form_id: int):
+    template = generate_static_template(form_id)
+    return JsonResponse({'success': template is not None}, status=200)
 
 
-@router.get('/form/static/{form_id}')
-def get_static_form(request, form_id: int):
-    return JsonResponse({'output': generate_static_template(form_id)})
+@router.get('/form/template/{form_id}', auth=worker_auth)
+def template_exists(request, form_id: int):
+    template_path = os.path.join(settings.BASE_DIR, f'form/templates/pdf/protocol_template_{form_id}.html')
+
+    exists = os.path.exists(template_path)
+    if not exists:
+        generate_static_template(form_id)
+
+    return JsonResponse({'exists': True}, status=200)
+
+
+@router.post('/form/document/{form_id}/{task_id}/', auth=worker_auth)
+def generate_document(request, form_id: int, task_id: int):
+    worker = request.worker
+
+    form = get_object_or_404(Form, id=form_id)
+    task = get_object_or_404(Task, id=task_id)
+
+    if not form.workers.filter(id=worker.id).exists():
+        return JsonResponse({'error': 'No such worker'}, status=404)
+
+    answer = get_object_or_404(FormAnswer, worker=worker, form=form, task=task)
+
+    attachment = generate_protocol_pdf(task, form, answer, worker)
+
+    return JsonResponse({'success': True}, status=200)
+

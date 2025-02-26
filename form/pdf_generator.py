@@ -3,22 +3,23 @@ import os
 from datetime import datetime
 
 from django.conf import settings
+from django.core.files.base import ContentFile
 from django.template import Template, Context
 from django.template.loader import render_to_string
 from django.templatetags.static import static
 from pyppeteer import launch
 
 from form.models import Form, FormAnswer
-from tasks.models import Task
+from tasks.models import Task, TaskAttachment
+from worker.models import Worker
 
 
-async def generate_pdf_with_pyppeteer(html_file_path, pdf_path):
+async def generate_pdf_with_pyppeteer(html_content):
+    """Generates a PDF from HTML using Pyppeteer and returns it as a byte stream."""
     browser = await launch(headless=True, handleSIGINT=False, handleSIGTERM=False, handleSIGHUP=False)
     page = await browser.newPage()
-    await page.setViewport({'width': 1920, 'height': 1080})
-    await page.goto(f'file://{html_file_path}')
-    await page.pdf({
-        'path': pdf_path,
+    await page.setContent(html_content)
+    pdf_bytes = await page.pdf({
         'format': 'A4',
         'printBackground': True,
         'scale': 1.0,
@@ -30,14 +31,19 @@ async def generate_pdf_with_pyppeteer(html_file_path, pdf_path):
         }
     })
     await browser.close()
+    return pdf_bytes
 
 
-def generate_protocol_pdf(task_id: int, form_id: int, form_answer_id: int):
-    form_answer = FormAnswer.objects.get(pk=form_answer_id)
-    task = Task.objects.get(pk=task_id)
-    template_path = os.path.join(settings.BASE_DIR, f'form/templates/pdf/protocol_template_{form_id}.html')
+def generate_protocol_pdf(task: Task, form: Form, form_answer: FormAnswer, worker: Worker) -> TaskAttachment | None:
+    """Generates a PDF and creates a TaskAttachment."""
+
+    template_path = os.path.join(settings.BASE_DIR, f'form/templates/pdf/protocol_template_{form.id}.html')
+    if not os.path.exists(template_path):
+        return None
+
     with open(template_path, "r", encoding="utf-8") as template_file:
         template_content = template_file.read()
+
     template = Template(template_content)
     context_data = {
         'form_title': form_answer.form.name,
@@ -61,18 +67,19 @@ def generate_protocol_pdf(task_id: int, form_id: int, form_answer_id: int):
 
     context = Context(context_data)
     html_string = template.render(context)
+    pdf_bytes = asyncio.run(generate_pdf_with_pyppeteer(html_string))
+    pdf_filename = f"protocol_{form_answer.id}.pdf"
+    pdf_file = ContentFile(pdf_bytes, name=pdf_filename)
+    task_attachment = TaskAttachment(
+        task=task,
+        worker=worker,
+        file=pdf_file,
+        description=f"Protokół {worker.first_name} {worker.last_name}",
+        attachment_type="file",
+    )
 
-    html_filename = f"protocol_{form_answer_id}.html"
-    html_path = os.path.join(settings.MEDIA_ROOT, 'pdf_reports', html_filename)
-    os.makedirs(os.path.dirname(html_path), exist_ok=True)
-    with open(html_path, "w", encoding="utf-8") as html_file:
-        html_file.write(html_string)
-
-    pdf_filename = f"protocol_{form_answer_id}.pdf"
-    pdf_path = os.path.join(settings.MEDIA_ROOT, 'pdf_reports', pdf_filename)
-    asyncio.run(generate_pdf_with_pyppeteer(html_path, pdf_path))
-
-    return html_path, pdf_path
+    task_attachment.save()
+    return task_attachment
 
 
 def generate_static_template(form_id: int) -> str:

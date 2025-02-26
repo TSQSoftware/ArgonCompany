@@ -112,6 +112,7 @@ def task_image_upload_path(instance, filename):
 class AttachmentType(models.TextChoices):
     CLIENT_SIGNATURE = "client_signature", "Client Signature"
     WORKER_SIGNATURE = "worker_signature", "Worker Signature"
+    FORM = "form", "Form"
 
 class TaskAttachment(models.Model):
     task = models.ForeignKey('Task', on_delete=models.CASCADE, related_name='attachments')
