@@ -9,6 +9,8 @@ from form.models import Form, FormAnswer, Question, Answer
 from form.pdf_generator import generate_static_template, generate_protocol_pdf
 from form.schemas import SimpleFormSchema, FormAnswerSchema, QuestionSchema, AnswerSchema, AnswerUpdateSchema
 from tasks.models import Task
+from tasks.schemas import TaskSchema
+from worker.models import Worker
 from worker.worker_auth import worker_auth
 
 router = Router()
@@ -130,9 +132,9 @@ def template_exists(request, form_id: int):
     return JsonResponse({'exists': True}, status=200)
 
 
-@router.post('/form/document/{form_id}/{task_id}/', auth=worker_auth)
+@router.post('/form/document/{form_id}/{task_id}/', response=TaskSchema)
 def generate_document(request, form_id: int, task_id: int):
-    worker = request.worker
+    worker = Worker.objects.first()
 
     form = get_object_or_404(Form, id=form_id)
     task = get_object_or_404(Task, id=task_id)
@@ -142,7 +144,7 @@ def generate_document(request, form_id: int, task_id: int):
 
     answer = get_object_or_404(FormAnswer, worker=worker, form=form, task=task)
 
-    attachment = generate_protocol_pdf(task, form, answer, worker)
+    generate_protocol_pdf(task, form, answer, worker)
 
-    return JsonResponse({'success': True}, status=200)
+    return task
 

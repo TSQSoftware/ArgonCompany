@@ -14,11 +14,12 @@ from tasks.models import Task, TaskAttachment
 from worker.models import Worker
 
 
-async def generate_pdf_with_pyppeteer(html_content):
-    """Generates a PDF from HTML using Pyppeteer and returns it as a byte stream."""
+async def generate_pdf_with_pyppeteer(html_file_path):
+    """Generates a PDF from HTML file using Pyppeteer and returns it as a byte stream."""
     browser = await launch(headless=True, handleSIGINT=False, handleSIGTERM=False, handleSIGHUP=False)
     page = await browser.newPage()
-    await page.setContent(html_content)
+    await page.setViewport({'width': 1920, 'height': 1080})
+    await page.goto(f'file://{html_file_path}')  # Use the local HTML file path
     pdf_bytes = await page.pdf({
         'format': 'A4',
         'printBackground': True,
@@ -36,7 +37,6 @@ async def generate_pdf_with_pyppeteer(html_content):
 
 def generate_protocol_pdf(task: Task, form: Form, form_answer: FormAnswer, worker: Worker) -> TaskAttachment | None:
     """Generates a PDF and creates a TaskAttachment."""
-
     template_path = os.path.join(settings.BASE_DIR, f'form/templates/pdf/protocol_template_{form.id}.html')
     if not os.path.exists(template_path):
         return None
@@ -67,19 +67,31 @@ def generate_protocol_pdf(task: Task, form: Form, form_answer: FormAnswer, worke
 
     context = Context(context_data)
     html_string = template.render(context)
-    pdf_bytes = asyncio.run(generate_pdf_with_pyppeteer(html_string))
+
+    html_filename = f"protocol_{form_answer.id}.html"
+    html_path = os.path.join(settings.MEDIA_ROOT, 'pdf_reports', html_filename)
+    os.makedirs(os.path.dirname(html_path), exist_ok=True)
+
+    with open(html_path, "w", encoding="utf-8") as html_file:
+        html_file.write(html_string)
+
+    pdf_bytes = asyncio.run(generate_pdf_with_pyppeteer(html_path))
     pdf_filename = f"protocol_{form_answer.id}.pdf"
     pdf_file = ContentFile(pdf_bytes, name=pdf_filename)
-    task_attachment = TaskAttachment(
+    task_attachment = TaskAttachment.objects.create(
         task=task,
         worker=worker,
-        file=pdf_file,
         description=f"Protokół {worker.first_name} {worker.last_name}",
         attachment_type="file",
         type='form',
     )
 
+    task_attachment.file = pdf_file
     task_attachment.save()
+
+    if os.path.exists(html_path):
+        os.remove(html_path)
+
     return task_attachment
 
 
