@@ -33,6 +33,14 @@ class CompanyWorkerSchema(ModelSchema):
 
 
 class SimpleWorkerSchema(ModelSchema):
+    role: dict | None
+
+    @staticmethod
+    def resolve_role(obj: Worker) -> dict | None:
+        if obj.role:
+            return UserRoleSchema.from_orm(obj.role).dict()
+        return None
+
     class Meta:
         model = Worker
         exclude = ('date_of_birth', 'phone_number', 'is_active', 'activation_key', 'uuid')
