@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 
+from tasks.models import Task
 from worker.models import Worker
 
 
@@ -64,6 +65,7 @@ class FormAnswer(models.Model):
     form = models.ForeignKey(Form, on_delete=models.CASCADE, related_name='answers')
     worker = models.ForeignKey(Worker, on_delete=models.CASCADE, related_name='form_answers')
     created_at = models.DateTimeField(auto_now_add=True)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"FormAnswer: {self.form.name} by {self.worker.first_name} {self.worker.last_name} on {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"

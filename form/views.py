@@ -16,11 +16,11 @@ def get_own_forms(request):
     return Form.objects.filter(workers__in=[worker])
 
 
-@router.get('/forms/{form_id}/answers', auth=worker_auth, response=list[FormAnswerSchema])
-def get_form_answers(request, form_id: int):
+@router.get('/forms/{form_id}/{task_id}/answer', auth=worker_auth, response=FormAnswerSchema)
+def get_form_answer(request, form_id: int, task_id: int):
     worker = request.worker
 
-    return FormAnswer.objects.filter(worker=worker, form_id=form_id)
+    return FormAnswer.objects.filter(worker=worker, form_id=form_id, task_id=task_id).get()
 
 
 @router.get('/questions/{form_id}', auth=worker_auth, response=list[QuestionSchema])
