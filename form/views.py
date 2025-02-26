@@ -20,7 +20,10 @@ def get_own_forms(request):
 def get_form_answer(request, form_id: int, task_id: int):
     worker = request.worker
 
-    return FormAnswer.objects.filter(worker=worker, form_id=form_id, task_id=task_id).get()
+    try:
+        return FormAnswer.objects.filter(worker=worker, form_id=form_id, task_id=task_id).get()
+    except FormAnswer.DoesNotExist:
+        return JsonResponse({'error': 'No such form'}, status=404)
 
 
 @router.get('/questions/{form_id}', auth=worker_auth, response=list[QuestionSchema])
