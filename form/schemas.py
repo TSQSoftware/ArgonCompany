@@ -1,6 +1,6 @@
 from ninja import ModelSchema, Schema
 
-from form.models import Form, FormAnswer, Question, Answer
+from form.models import Form, FormAnswer, Question, Answer, QuestionCategory
 
 
 class FormSchema(ModelSchema):
@@ -21,7 +21,21 @@ class FormAnswerSchema(ModelSchema):
         fields = '__all__'
 
 
+class QuestionCategorySchema(ModelSchema):
+    class Meta:
+        model = QuestionCategory
+        fields = '__all__'
+
+
 class QuestionSchema(ModelSchema):
+    category: dict | None
+
+    @staticmethod
+    def resolve_category(obj: Question) -> dict | None:
+        if obj.category:
+            return QuestionCategorySchema.from_orm(obj.category).dict()
+        return None
+
     class Meta:
         model = Question
         fields = '__all__'
