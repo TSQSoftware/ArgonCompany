@@ -35,6 +35,15 @@ class TaskAttachmentSchema(ModelSchema):
 
 
 class TaskStatusSchema(ModelSchema):
+    color: str | None
+
+    @staticmethod
+    def resolve_color(obj: TaskStatus) -> str | None:
+        if obj.color:
+            return obj.color.color
+        return None
+
+
     class Meta:
         model = TaskStatus
         fields = '__all__'

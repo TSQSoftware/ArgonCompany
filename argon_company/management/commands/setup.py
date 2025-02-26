@@ -7,7 +7,7 @@ from tasks.models import TaskStatus
 def first_time_setup(self: BaseCommand) -> None:
     if TaskStatus.objects.count() == 0:
         TaskStatus.objects.update_or_create(name="W realizacji")
-        TaskStatus.objects.update_or_create(name="Zrealizowane", require_confirmation=True)
+        TaskStatus.objects.update_or_create(name="Zrealizowane", require_confirmation=True, completed=True)
         TaskStatus.objects.update_or_create(name="Anulowane", require_confirmation=True)
         TaskStatus.objects.update_or_create(name="Zlecone")
         TaskStatus.objects.update_or_create(name="Oczekuje potwierdzenia")
