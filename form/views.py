@@ -25,6 +25,14 @@ def get_form_answer(request, form_id: int, task_id: int):
     except FormAnswer.DoesNotExist:
         return JsonResponse({'error': 'No such form'}, status=404)
 
+@router.post('/forms/{form_id}/{task_id}/answer', auth=worker_auth, response=FormAnswerSchema)
+def create_form_answer(request, form_id: int, task_id: int):
+    worker = request.worker
+
+    answer = FormAnswer.objects.create(worker=worker, form_id=form_id, task_id=task_id)
+
+    return answer
+
 
 @router.get('/questions/{form_id}', auth=worker_auth, response=list[QuestionSchema])
 def get_questions(request, form_id: int):
