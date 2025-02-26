@@ -28,7 +28,6 @@ class WorkerConfig(AppConfig):
     name = 'worker'
 
     def ready(self):
-        """Runs when the app is loaded, executes update_license command."""
         if "runserver" in sys.argv and not os.environ.get("RUN_MAIN"):
             run_create_admin()
             if not settings.DEBUG:

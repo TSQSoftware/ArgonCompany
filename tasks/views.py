@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from ninja import Router
 
 from tasks.models import Task, TaskStatus, TaskNote
-from tasks.schemas import TaskSchema
+from tasks.schemas import TaskSchema, TaskStatusSchema
 from worker.worker_auth import worker_auth
 
 router = Router()
@@ -24,6 +24,11 @@ def get_own_tasks(request):
         return JsonResponse({"error": "Worker not authenticated"}, status=401)
 
     return Task.objects.filter(workers__in=[request.worker.id]).all()
+
+
+@router.get('/task/statuses', response=list[TaskStatusSchema])
+def get_task_statuses(request):
+    return TaskStatus.objects.all()
 
 
 @router.get('/task/{task_id}', response=TaskSchema)

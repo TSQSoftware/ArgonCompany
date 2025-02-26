@@ -2,7 +2,7 @@ from ninja import ModelSchema
 
 from client.schemas import ClientSchema, ClientPlaceSchema, ClientMachineSchema
 from data.schemas import TaskCategorySchema, TagSchema
-from tasks.models import Task, TaskNote, TaskAttachment
+from tasks.models import Task, TaskNote, TaskAttachment, TaskStatus
 from worker.schemas import SimpleWorkerSchema
 
 
@@ -34,6 +34,12 @@ class TaskAttachmentSchema(ModelSchema):
         fields = '__all__'
 
 
+class TaskStatusSchema(ModelSchema):
+    class Meta:
+        model = TaskStatus
+        fields = '__all__'
+
+
 class TaskSchema(ModelSchema):
     category: dict | None
     workers: list[dict]
@@ -43,6 +49,13 @@ class TaskSchema(ModelSchema):
     client_machines: list[dict]
     notes: list[dict]
     attachments: list[dict]
+    status: dict | None
+
+    @staticmethod
+    def resolve_status(obj: Task) -> dict | None:
+        if obj.status:
+            return TaskStatusSchema.from_orm(obj.status).dict()
+        return None
 
     @staticmethod
     def resolve_notes(obj: Task) -> list[dict]:

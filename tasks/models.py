@@ -6,13 +6,15 @@ from geopy.exc import GeocoderTimedOut
 from location_field.models.plain import PlainLocationField
 
 from client.models import Client, ClientPlace, ClientMachine
-from data.models import Tag, TaskCategory
+from data.models import Tag, TaskCategory, Color
 from worker.models import Worker
 
 
 class TaskStatus(models.Model):
     name = models.CharField(max_length=50, unique=True)
     require_confirmation = models.BooleanField(default=False)
+    color = models.ForeignKey(Color, null=True, blank=True, default=Color.default, on_delete=models.SET_NULL)
+    completed = models.BooleanField(default=False)
 
     class Config:
         arbitrary_types_allowed = True

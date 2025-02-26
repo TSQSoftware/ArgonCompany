@@ -4,6 +4,7 @@ from typing import Optional
 from ninja import ModelSchema, Schema
 
 from argon_company import settings
+from data.schemas import UserRoleSchema
 from worker.models import Worker, WorkerLocation
 
 
@@ -12,9 +13,15 @@ class WorkerSchema(ModelSchema):
         model = Worker
         fields = '__all__'
 
-
 class CompanyWorkerSchema(ModelSchema):
     company_name: str
+    role: dict | None
+
+    @staticmethod
+    def resolve_role(obj: Worker) -> dict | None:
+        if obj.role:
+            return UserRoleSchema.from_orm(obj.role).dict()
+        return None
 
     @staticmethod
     def resolve_company_name(obj: Worker) -> str:
@@ -46,10 +53,12 @@ class WorkerUpdateSchema(Schema):
     phone_number: Optional[str] = None
     role: Optional[str] = None
 
+
 class WorkerLocationSchema(ModelSchema):
     class Meta:
         model = WorkerLocation
         fields = '__all__'
+
 
 class WorkerLocationCreateSchema(Schema):
     timestamp: datetime
