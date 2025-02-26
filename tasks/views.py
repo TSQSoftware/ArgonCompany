@@ -126,4 +126,6 @@ def add_attachment(request, task_id: int, description: str = None,
     else:
         attachment.file = attachment_file
 
+    attachment.save()
+
     return task
