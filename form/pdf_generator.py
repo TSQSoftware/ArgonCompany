@@ -75,9 +75,6 @@ def generate_protocol_pdf(task: Task, form: Form, form_answer: FormAnswer, worke
     with open(html_path, "w", encoding="utf-8") as html_file:
         html_file.write(html_string)
 
-    pdf_bytes = asyncio.run(generate_pdf_with_pyppeteer(html_path))
-    pdf_filename = f"protocol_{form_answer.id}.pdf"
-    pdf_file = ContentFile(pdf_bytes, name=pdf_filename)
     task_attachment = TaskAttachment.objects.create(
         task=task,
         worker=worker,
@@ -85,6 +82,10 @@ def generate_protocol_pdf(task: Task, form: Form, form_answer: FormAnswer, worke
         attachment_type="file",
         type='form',
     )
+
+    pdf_bytes = asyncio.run(generate_pdf_with_pyppeteer(html_path))
+    pdf_filename = f"protocol_{form_answer.id}/{task_attachment.id}.pdf"
+    pdf_file = ContentFile(pdf_bytes, name=pdf_filename)
 
     task_attachment.file = pdf_file
     task_attachment.save()
