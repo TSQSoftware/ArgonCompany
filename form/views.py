@@ -35,7 +35,7 @@ def create_form_answer(request, form_id: int, task_id: int):
     except Form.DoesNotExist:
         return JsonResponse({'error': 'No such form'}, status=404)
 
-    if not form.workers.filter(id=worker).exists():
+    if not form.workers.filter(id=worker.id).exists():
         return JsonResponse({'error': 'No such worker'}, status=404)
 
     try:
