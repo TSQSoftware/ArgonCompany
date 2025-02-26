@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from django.db import models
@@ -101,12 +102,20 @@ class TaskNote(models.Model):
         super().save(*args, **kwargs)
 
 
+def task_attachment_upload_path(instance, filename):
+    return os.path.join('task_attachments', str(instance.id), filename)
+
+
+def task_image_upload_path(instance, filename):
+    return os.path.join('task_images', str(instance.id), filename)
+
+
 class TaskAttachment(models.Model):
     task = models.ForeignKey('Task', on_delete=models.CASCADE, related_name='attachments')
     worker = models.ForeignKey(Worker, on_delete=models.SET_NULL, null=True, blank=True,
                                related_name='task_attachments')
-    file = models.FileField(upload_to='task_attachments/', blank=True, null=True)
-    image = models.ImageField(upload_to='task_images/', blank=True, null=True)
+    file = models.FileField(upload_to=task_attachment_upload_path, blank=True, null=True)
+    image = models.ImageField(upload_to=task_image_upload_path, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     attachment_type = models.CharField(
@@ -135,4 +144,6 @@ class TaskAttachment(models.Model):
 
             self.custom_id = custom_id
 
+        if not self.id:
+            super().save(*args, **kwargs)
         super().save(*args, **kwargs)

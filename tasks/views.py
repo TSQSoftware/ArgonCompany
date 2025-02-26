@@ -1,7 +1,8 @@
 from django.http import JsonResponse
-from ninja import Router
+from ninja import Router, UploadedFile, File
+from typing_extensions import Optional
 
-from tasks.models import Task, TaskStatus, TaskNote
+from tasks.models import Task, TaskStatus, TaskNote, TaskAttachment
 from tasks.schemas import TaskSchema, TaskStatusSchema
 from worker.worker_auth import worker_auth
 
@@ -92,5 +93,38 @@ def add_note(request, task_id: int, note: str):
 
     task_note = TaskNote(task=task, note=note, worker=worker)
     task_note.save()
+
+    return task
+
+
+@router.post('/task/{task_id}/attachment', response=TaskSchema, auth=worker_auth)
+def add_attachment(request, task_id: int, description: Optional[str],
+                   attachment_file: UploadedFile = File(default_factory=list)):
+    worker = request.worker
+
+    try:
+        task = Task.objects.get(id=task_id)
+    except Task.DoesNotExist:
+        return JsonResponse({'error': 'Task not found'}, status=404)
+
+    if not task.workers.filter(id=worker.id).exists():
+        return JsonResponse({'error': 'Worker not authorized'}, status=401)
+
+    if attachment_file.content_type.startswith("image/"):
+        attachment_type = "image"
+    else:
+        attachment_type = "file"
+
+    attachment = TaskAttachment.objects.create(
+        task=task,
+        worker=worker,
+        description=description,
+        attachment_type=attachment_type,
+    )
+
+    if attachment_type == "image":
+        attachment.image = attachment_file
+    else:
+        attachment.file = attachment_file
 
     return task
