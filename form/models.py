@@ -60,6 +60,9 @@ class Question(models.Model):
                                         related_name='sub_questions')
     media_url = models.URLField(blank=True, null=True)  # For images, videos, or audio
 
+    def __str__(self):
+        return self.title
+
 
 class FormAnswer(models.Model):
     form = models.ForeignKey(Form, on_delete=models.CASCADE, related_name='answers')
