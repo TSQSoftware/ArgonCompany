@@ -81,31 +81,6 @@ class Answer(models.Model):
     single_choice_answer = models.CharField(max_length=255, blank=True, null=True)
     multiple_choice_answer = models.JSONField(default=list, blank=True, null=True)
 
-    def clean(self):
-        if self.question.question_type == Question.TEXT:
-            if not self.text_answer:
-                raise ValidationError("Text answer is required for text questions.")
-            if self.single_choice_answer or self.multiple_choice_answer:
-                raise ValidationError("Only text_answer should be filled for text questions.")
-        elif self.question.question_type == Question.SINGLE_CHOICE:
-            if not self.single_choice_answer:
-                raise ValidationError("Single choice answer is required for single choice questions.")
-            if self.single_choice_answer not in self.question.choices:
-                raise ValidationError("Invalid choice selected.")
-            if self.text_answer or self.multiple_choice_answer:
-                raise ValidationError("Only single_choice_answer should be filled for single choice questions.")
-        elif self.question.question_type == Question.MULTIPLE_CHOICE:
-            if not self.multiple_choice_answer:
-                raise ValidationError("Multiple choice answer is required for multiple choice questions.")
-            if not all(choice in self.question.choices for choice in self.multiple_choice_answer):
-                raise ValidationError("Invalid choices selected.")
-            if self.text_answer or self.single_choice_answer:
-                raise ValidationError("Only multiple_choice_answer should be filled for multiple choice questions.")
-
-    def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return f"Answer to '{self.question.title}' by {self.form_answer.worker.first_name} {self.form_answer.worker.last_name} in Form '{self.form_answer.form.name}'"
 
