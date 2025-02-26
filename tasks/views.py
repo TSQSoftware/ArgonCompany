@@ -97,7 +97,7 @@ def add_note(request, task_id: int, note: str):
 
 
 @router.post('/task/{task_id}/attachment', response=TaskSchema, auth=worker_auth)
-def add_attachment(request, task_id: int, description: str = None,
+def add_attachment(request, task_id: int, description: str = None, attachment_choice: str = None,
                    attachment_file: UploadedFile = File()):
     worker = request.worker
 
@@ -119,6 +119,7 @@ def add_attachment(request, task_id: int, description: str = None,
         worker=worker,
         description=description,
         attachment_type=attachment_type,
+        type=attachment_choice,
     )
 
     if attachment_type == "image":

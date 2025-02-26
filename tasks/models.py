@@ -109,6 +109,9 @@ def task_attachment_upload_path(instance, filename):
 def task_image_upload_path(instance, filename):
     return os.path.join('task_images', str(instance.id), filename)
 
+class AttachmentType(models.TextChoices):
+    CLIENT_SIGNATURE = "client_signature", "Client Signature"
+    WORKER_SIGNATURE = "worker_signature", "Worker Signature"
 
 class TaskAttachment(models.Model):
     task = models.ForeignKey('Task', on_delete=models.CASCADE, related_name='attachments')
@@ -124,6 +127,7 @@ class TaskAttachment(models.Model):
         default='file'
     )
     custom_id = models.CharField(max_length=50, unique=True, blank=True, null=True)
+    type = models.CharField(max_length=50, choices=AttachmentType.choices, blank=True, null=True)
 
     class Meta:
         verbose_name = "Task Attachment"
