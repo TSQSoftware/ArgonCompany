@@ -2,6 +2,7 @@ import asyncio
 import os
 from datetime import datetime
 
+from PIL import Image, ExifTags
 from django.core.files.base import ContentFile
 from django.template import Template, Context
 from django.template.loader import render_to_string
@@ -14,12 +15,25 @@ from tasks.models import Task, TaskAttachment
 from worker.models import Worker
 
 
+def get_image_rotation(image_path):
+    try:
+        image = Image.open(image_path)
+        exif = image.getexif()
+        if exif:
+            for tag, value in exif.items():
+                if ExifTags.TAGS.get(tag) == 'Orientation':
+                    return {3: 180, 6: 270, 8: 90}.get(value, 0)
+    except Exception as e:
+        print(f"Error reading image EXIF data: {e}")
+    return 0
+
+
 async def generate_pdf_with_pyppeteer(html_file_path):
     """Generates a PDF from HTML file using Pyppeteer and returns it as a byte stream."""
     browser = await launch(headless=True, handleSIGINT=False, handleSIGTERM=False, handleSIGHUP=False)
     page = await browser.newPage()
     await page.setViewport({'width': 1920, 'height': 1080})
-    await page.goto(f'file://{html_file_path}')  # Use the local HTML file path
+    await page.goto(f'file://{html_file_path}')
     pdf_bytes = await page.pdf({
         'format': 'A4',
         'printBackground': True,
@@ -69,6 +83,14 @@ def generate_protocol_pdf(task: Task, form: Form, form_answer: FormAnswer, worke
         'worker_signature_url': (
             os.path.join(settings.MEDIA_ROOT, str(worker_signature.image.url).replace(settings.MEDIA_URL, ''))
         ) if worker_signature and worker_signature.image else None,
+        'client_signature_rotation': get_image_rotation(os.path.join(settings.MEDIA_ROOT,
+                                                                     str(client_signature.image.url).replace(
+                                                                         settings.MEDIA_URL,
+                                                                         ''))) if client_signature and client_signature.image else 0,
+        'worker_signature_rotation': get_image_rotation(os.path.join(settings.MEDIA_ROOT,
+                                                                     str(worker_signature.image.url).replace(
+                                                                         settings.MEDIA_URL,
+                                                                         ''))) if worker_signature and worker_signature.image else 0,
     }
 
     for index, answer in enumerate(form_answer.answers.all(), start=1):
@@ -123,6 +145,8 @@ def generate_static_template(form_id: int) -> str:
         'generated_date': "{{ generated_date }}",
         'client_signature_url': "{{ client_signature_url }}",
         'worker_signature_url': "{{ worker_signature_url }}",
+        'client_signature_rotation': "{{ client_signature_rotation }}",
+        'worker_signature_rotation': "{{ worker_signature_rotation }}",
         'font_path': os.path.join(settings.STATIC_ROOT, 'fonts/'),
         'asset_path': os.path.join(settings.STATIC_ROOT, 'assets/'),
         'category_groups': [],

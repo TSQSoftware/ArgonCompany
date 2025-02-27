@@ -138,17 +138,6 @@
             font-weight: bold;
         }
 
-        .signature-section {
-            margin-top: 50px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .signature-box {
-            width: 45%;
-            margin-top: 40px;
-        }
-
         .footer-note {
             text-align: center;
             margin-top: 50px;
@@ -187,11 +176,45 @@
             page-break-inside: avoid;
         }
 
+        .signature-section {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .signature-box {
+            width: 45%;
+            text-align: center;
+        }
+
+        .signature-label {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
         .signature-image {
             max-width: 100%;
             height: auto;
             display: block;
+            object-fit: contain;
+            transform: rotate(0deg);
         }
+
+        /* Auto-rotate incorrectly oriented signatures */
+        .signature-image[data-rotate="90"] {
+            transform: rotate(90deg);
+        }
+
+        .signature-image[data-rotate="180"] {
+            transform: rotate(180deg);
+        }
+
+        .signature-image[data-rotate="270"] {
+            transform: rotate(270deg);
+        }
+
     </style>
 </head>
 <body>
@@ -286,13 +309,23 @@
 
     <div class="signature-section avoid-page-break">
         <div class="signature-box">
-            <p>Podpis Klienta:</p>
-            <img src="{{ client_signature_url }}" class="signature-image" alt="Podpis klienta">
+            <p class="signature-label">Podpis Klienta:</p>
+            {% if client_signature_url %}
+                <img src="{{ client_signature_url }}" class="signature-image"
+                     data-rotate="{{ client_signature_rotation }}" alt="Podpis Klienta">
+            {% else %}
+                <div class="signature-line"></div>
+            {% endif %}
         </div>
 
         <div class="signature-box">
-            <p>Podpis przedstawiciela usług:</p>
-            <img src="{{ worker_signature_url }}" class="signature-image" alt="Podpis pracownika">
+            <p class="signature-label">Podpis Przedstawiciela Usług:</p>
+            {% if worker_signature_url %}
+                <img src="{{ worker_signature_url }}" class="signature-image"
+                     data-rotate="{{ worker_signature_rotation }}" alt="Podpis Przedstawiciela">
+            {% else %}
+                <div class="signature-line"></div>
+            {% endif %}
         </div>
     </div>
 
