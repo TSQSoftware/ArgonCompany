@@ -20,9 +20,10 @@ def get_image_rotation(image_path):
         image = Image.open(image_path)
         exif = image.getexif()
         if exif:
-            for tag, value in exif.items():
-                if ExifTags.TAGS.get(tag) == 'Orientation':
-                    return {3: 180, 6: 270, 8: 90}.get(value, 0)
+            orientation_key = next((key for key, value in ExifTags.TAGS.items() if value == "Orientation"), None)
+            if orientation_key:
+                orientation = exif.get(orientation_key)
+                return {3: 180, 6: 270, 8: 90}.get(orientation, 0)
     except Exception as e:
         print(f"Error reading image EXIF data: {e}")
     return 0
@@ -84,13 +85,9 @@ def generate_protocol_pdf(task: Task, form: Form, form_answer: FormAnswer, worke
             os.path.join(settings.MEDIA_ROOT, str(worker_signature.image.url).replace(settings.MEDIA_URL, ''))
         ) if worker_signature and worker_signature.image else None,
         'client_signature_rotation': get_image_rotation(os.path.join(settings.MEDIA_ROOT,
-                                                                     str(client_signature.image.url).replace(
-                                                                         settings.MEDIA_URL,
-                                                                         ''))) if client_signature and client_signature.image else 0,
+                                                                     client_signature.image.name)) if client_signature and client_signature.image else 0,
         'worker_signature_rotation': get_image_rotation(os.path.join(settings.MEDIA_ROOT,
-                                                                     str(worker_signature.image.url).replace(
-                                                                         settings.MEDIA_URL,
-                                                                         ''))) if worker_signature and worker_signature.image else 0,
+                                                                     worker_signature.image.name)) if worker_signature and worker_signature.image else 0,
     }
 
     for index, answer in enumerate(form_answer.answers.all(), start=1):
