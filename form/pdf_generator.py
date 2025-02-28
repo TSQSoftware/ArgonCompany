@@ -1,5 +1,7 @@
+import asyncio
 import os
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
 from PIL import Image, ExifTags
@@ -7,6 +9,7 @@ from django.core.files.base import ContentFile
 from django.template import Template, Context
 from django.template.loader import render_to_string
 from django.templatetags.static import static
+from playwright.async_api import async_playwright
 
 from argon_company import settings
 from form.models import Form, FormAnswer
@@ -28,10 +31,6 @@ def get_image_rotation(image_path):
     return 0
 
 
-import asyncio
-from playwright.async_api import async_playwright
-
-
 async def generate_pdf_async(html_file_path):
     """Generates a PDF from an HTML file using Playwright asynchronously."""
 
@@ -47,6 +46,17 @@ async def generate_pdf_async(html_file_path):
                                    margin={'left': '10mm', 'right': '10mm'})
         await browser.close()
         return pdf_bytes
+
+
+def generate_pdf(html_file_path):
+    """Runs Playwright inside a thread on Windows to avoid NotImplementedError."""
+
+    if sys.platform == "win32":
+        loop = asyncio.new_event_loop()
+        with ThreadPoolExecutor() as pool:
+            return loop.run_until_complete(generate_pdf_async(html_file_path))
+    else:
+        return asyncio.run(generate_pdf_async(html_file_path))  # Works normally on macOS
 
 
 def generate_protocol_pdf(task: Task, form: Form, form_answer: FormAnswer, worker: Worker) -> TaskAttachment | None:
@@ -110,7 +120,7 @@ def generate_protocol_pdf(task: Task, form: Form, form_answer: FormAnswer, worke
         type='form',
     )
 
-    pdf_bytes = asyncio.run(generate_pdf_async(html_path))
+    pdf_bytes = generate_pdf(html_path)
     pdf_filename = f"protocol_{form_answer.id}/{task_attachment.id}.pdf"
     pdf_file = ContentFile(pdf_bytes, name=pdf_filename)
 
