@@ -28,18 +28,18 @@ def get_image_rotation(image_path):
     return 0
 
 
-async def generate_pdf(html_file_path):
-    """Generates a PDF from HTML file using Playwright (asynchronous) and returns it as a byte stream."""
-    from playwright.async_api import async_playwright
+def generate_pdf(html_file_path):
+    """Generates a PDF from HTML file using Playwright (synchronous) and returns it as a byte stream."""
+    from playwright.sync_api import sync_playwright
 
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        page = await browser.new_page()
-        await page.set_viewport_size({'width': 1920, 'height': 1080})
-        await page.goto(f'file://{html_file_path}')
-        pdf_bytes = await page.pdf(format='A4', print_background=True, scale=1.0,
-                                   margin={'left': '10mm', 'right': '10mm', 'top': '10mm', 'bottom': '10mm'})
-        await browser.close()
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
+        page.set_viewport_size({'width': 1920, 'height': 1080})
+        page.goto(f'file://{html_file_path}')
+        pdf_bytes = page.pdf(format='A4', print_background=True, scale=1.0,
+                             margin={'left': '10mm', 'right': '10mm', 'top': '10mm', 'bottom': '10mm'})
+        browser.close()
     return pdf_bytes
 
 
@@ -104,7 +104,7 @@ def generate_protocol_pdf(task: Task, form: Form, form_answer: FormAnswer, worke
         type='form',
     )
 
-    pdf_bytes = asyncio.run(generate_pdf(html_path))
+    pdf_bytes = generate_pdf(html_path)
     pdf_filename = f"protocol_{form_answer.id}/{task_attachment.id}.pdf"
     pdf_file = ContentFile(pdf_bytes, name=pdf_filename)
 
