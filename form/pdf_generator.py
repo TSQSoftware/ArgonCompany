@@ -1,7 +1,6 @@
 import asyncio
 import os
 import sys
-from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
 from PIL import Image, ExifTags
@@ -10,6 +9,7 @@ from django.template import Template, Context
 from django.template.loader import render_to_string
 from django.templatetags.static import static
 from playwright.async_api import async_playwright
+from playwright.sync_api import sync_playwright
 
 from argon_company import settings
 from form.models import Form, FormAnswer
@@ -49,14 +49,26 @@ async def generate_pdf_async(html_file_path):
 
 
 def generate_pdf(html_file_path):
-    """Runs Playwright inside a thread on Windows to avoid NotImplementedError."""
+    """Generates a PDF from an HTML file using Playwright."""
 
     if sys.platform == "win32":
-        loop = asyncio.new_event_loop()
-        with ThreadPoolExecutor() as pool:
-            return loop.run_until_complete(generate_pdf_async(html_file_path))
+        return generate_pdf_sync(html_file_path)  # Use sync mode on Windows
     else:
-        return asyncio.run(generate_pdf_async(html_file_path))  # Works normally on macOS
+        return asyncio.run(generate_pdf_async(html_file_path))  # Use async normally on macOS/Linux
+
+
+def generate_pdf_sync(html_file_path):
+    """Runs Playwright synchronously to avoid Windows subprocess issues."""
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
+        page.set_viewport_size({'width': 1920, 'height': 1080})
+        page.goto(f'file://{html_file_path}')
+        pdf_bytes = page.pdf(format='A4', print_background=True, scale=1.0,
+                             margin={'left': '10mm', 'right': '10mm'})
+        browser.close()
+        return pdf_bytes
 
 
 def generate_protocol_pdf(task: Task, form: Form, form_answer: FormAnswer, worker: Worker) -> TaskAttachment | None:
