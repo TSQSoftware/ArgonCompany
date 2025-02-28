@@ -32,7 +32,7 @@ async def generate_pdf(html_file_path):
     """Generates a PDF from HTML file using Playwright (asynchronous) and returns it as a byte stream."""
     from playwright.async_api import async_playwright
 
-    async with async_playwright() as p:
+    async with async_playwright().start() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
         await page.set_viewport_size({'width': 1920, 'height': 1080})
