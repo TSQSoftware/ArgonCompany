@@ -162,6 +162,8 @@ if %SKIP_LICENSE%==0 (
 :: ==============================
 :: RUN DJANGO MIGRATIONS & START APP
 :: ==============================
+playwright install
+
 echo %MSG_MIGRATIONS%
 python manage.py migrate
 
