@@ -1,5 +1,5 @@
-import asyncio
 import os
+import sys
 from datetime import datetime
 
 from PIL import Image, ExifTags
@@ -7,7 +7,6 @@ from django.core.files.base import ContentFile
 from django.template import Template, Context
 from django.template.loader import render_to_string
 from django.templatetags.static import static
-from playwright.async_api import async_playwright
 
 from argon_company import settings
 from form.models import Form, FormAnswer
@@ -29,12 +28,15 @@ def get_image_rotation(image_path):
     return 0
 
 
-async def generate_pdf_async(html_file_path):
+import asyncio
+from playwright.async_api import async_playwright
 
-    try:
-        asyncio.get_running_loop()
-    except RuntimeError:
-        asyncio.set_event_loop(asyncio.new_event_loop())
+
+async def generate_pdf_async(html_file_path):
+    """Generates a PDF from an HTML file using Playwright asynchronously."""
+
+    if sys.platform == "win32":
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
@@ -45,6 +47,7 @@ async def generate_pdf_async(html_file_path):
                                    margin={'left': '10mm', 'right': '10mm'})
         await browser.close()
         return pdf_bytes
+
 
 def generate_protocol_pdf(task: Task, form: Form, form_answer: FormAnswer, worker: Worker) -> TaskAttachment | None:
     """Generates a PDF and creates a TaskAttachment."""
