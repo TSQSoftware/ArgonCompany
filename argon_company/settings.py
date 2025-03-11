@@ -83,12 +83,15 @@ WSGI_APPLICATION = 'argon_company.wsgi.application'
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+DATA_ROOT = BASE_DIR / "data"
+
 os.makedirs(MEDIA_ROOT, exist_ok=True)
+os.makedirs(DATA_ROOT, exist_ok=True)
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': MEDIA_ROOT / 'db.sqlite3',
+        'NAME': DATA_ROOT / 'db.sqlite3',
     }
 }
 
