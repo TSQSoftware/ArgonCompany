@@ -16,6 +16,9 @@ class WorkerAuth(HttpBearer):
             worker_id = payload.get('worker_id')
             worker_uuid = payload.get('uuid')
             exp = payload.get('exp')
+            print(worker_id)
+            print(worker_uuid)
+            print(exp)
 
             if datetime.now(timezone.utc).timestamp() > exp:
                 return None
