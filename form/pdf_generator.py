@@ -52,9 +52,9 @@ def generate_pdf(html_file_path):
     """Generates a PDF from an HTML file using Playwright."""
 
     if sys.platform == "win32":
-        return generate_pdf_sync(html_file_path)  # Use sync mode on Windows
+        return generate_pdf_sync(html_file_path)
     else:
-        return asyncio.run(generate_pdf_async(html_file_path))  # Use async normally on macOS/Linux
+        return asyncio.run(generate_pdf_async(html_file_path))
 
 
 def generate_pdf_sync(html_file_path):
