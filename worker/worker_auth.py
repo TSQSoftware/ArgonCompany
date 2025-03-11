@@ -17,8 +17,9 @@ class WorkerAuth(HttpBearer):
             worker_uuid = payload.get('uuid')
             exp = payload.get('exp')
 
-            print('exp', exp)
-            if datetime.now(timezone.utc).timestamp() > exp:
+            exp_datetime = datetime.fromtimestamp(exp, tz=timezone.utc)
+            if datetime.now(timezone.utc) > exp_datetime:
+                print("Token expired!")
                 return None
 
             worker = Worker.objects.get(id=worker_id)
@@ -27,8 +28,6 @@ class WorkerAuth(HttpBearer):
             print(f'{worker.uuid} - {worker_uuid}')
             if str(worker.uuid) != worker_uuid:
                 return None
-
-
 
             request.worker = worker
             return worker
