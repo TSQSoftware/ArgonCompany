@@ -83,7 +83,7 @@ WSGI_APPLICATION = 'argon_company.wsgi.application'
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-DATA_ROOT = BASE_DIR / "data"
+DATA_ROOT = BASE_DIR / "database"
 
 os.makedirs(MEDIA_ROOT, exist_ok=True)
 os.makedirs(DATA_ROOT, exist_ok=True)
