@@ -29,7 +29,7 @@ def login(request, activation_key: str, first_name: str, last_name: str):
     payload = {
         'uuid': str(uuid),
         'worker_id': worker.id,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=31)
+        'exp': datetime.datetime.now() + datetime.timedelta(days=31)
     }
 
     token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
