@@ -16,17 +16,19 @@ class WorkerAuth(HttpBearer):
             worker_id = payload.get('worker_id')
             worker_uuid = payload.get('uuid')
             exp = payload.get('exp')
-            print(worker_id)
-            print(worker_uuid)
-            print(exp)
 
+            print('exp', exp)
             if datetime.now(timezone.utc).timestamp() > exp:
                 return None
 
             worker = Worker.objects.get(id=worker_id)
+            print('worker', worker)
 
+            print(f'{worker.uuid} - {worker_uuid}')
             if str(worker.uuid) != worker_uuid:
                 return None
+
+
 
             request.worker = worker
             return worker
