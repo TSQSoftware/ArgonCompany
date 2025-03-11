@@ -15,15 +15,7 @@ class WorkerAuth(HttpBearer):
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
             worker_id = payload.get('worker_id')
             worker_uuid = payload.get('uuid')
-            exp = payload.get('exp')
-
-            exp_datetime = datetime.fromtimestamp(exp, tz=timezone.utc)
-            if datetime.now(timezone.utc) > exp_datetime:
-                print("Token expired!")
-                return None
-
             worker = Worker.objects.get(id=worker_id)
-            print('worker', worker)
 
             print(f'{worker.uuid} - {worker_uuid}')
             if str(worker.uuid) != worker_uuid:
