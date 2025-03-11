@@ -80,13 +80,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'argon_company.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'media' / 'db.sqlite3',
+        'NAME': MEDIA_ROOT / 'db.sqlite3',
     }
 }
 
@@ -163,6 +165,3 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
-
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
