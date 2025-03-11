@@ -22,7 +22,7 @@ class WorkerAuth(HttpBearer):
 
             worker = Worker.objects.get(id=worker_id)
 
-            if worker.uuid != worker_uuid:
+            if str(worker.uuid) != worker_uuid:
                 return None
 
             request.worker = worker
