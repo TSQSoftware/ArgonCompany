@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'form',
     'data',
     'client',
+    'dispatch',
     'location_field.apps.DefaultConfig',
 ]
 
