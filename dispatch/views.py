@@ -1,10 +1,12 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 
+from dispatch.forms import TaskForm
 from tasks.models import Task
+from worker.models import Worker
 
 
 def admin_login(request):
@@ -38,5 +40,24 @@ def admin_logout(request):
 @login_required
 def dispatch_dashboard(request):
     tasks = Task.objects.all()
-    workers = []
-    return render(request, "dispatch/dashboard.html", {"workers": workers, "tasks": tasks})
+    workers = Worker.objects.all()
+
+    if request.method == "POST":
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("dispatch:dispatch_dashboard")
+    else:
+        form = TaskForm()
+
+    return render(
+        request,
+        "dispatch/dashboard.html",
+        {"workers": workers, "tasks": tasks, "form": form}
+    )
+
+
+@login_required
+def task_detail(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+    return render(request, "dispatch/task_detail.html", {"task": task})

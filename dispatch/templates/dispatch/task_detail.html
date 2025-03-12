@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+        .back-btn {
+            display: inline-block;
+            background: gray;
+            color: white;
+            padding: 10px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Task Details</h2>
+    <p><strong>Name:</strong> {{ task.name }}</p>
+    <p><strong>Category:</strong> {{ task.category.name|default:"No Category" }}</p>
+    <p><strong>Description:</strong> {{ task.description|default:"No description" }}</p>
+    <p><strong>Deadline:</strong> {{ task.deadline|default:"No deadline" }}</p>
+    <p><strong>Workers:</strong> {{ task.workers.all|join:", " }}</p>
+    <p><strong>Status:</strong> {{ task.status.name|default:"No status" }}</p>
+
+    <a href="{% url 'dispatch:dispatch_dashboard' %}" class="back-btn">Back to Dashboard</a>
+</div>
+
+</body>
+</html>
