@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dispatch Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+<nav class="bg-gray-900 text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4">
+            <a href="{% url 'dispatch:dispatch_dashboard' %}" class="text-xl font-semibold">Dispatch</a>
+            <div class="flex space-x-6">
+                <div class="relative group">
+                    <button class="hover:underline">Client ▼</button>
+                    <div class="absolute hidden group-hover:block bg-white shadow-md rounded-md py-2 w-40">
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Klienci</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Miejsca</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Maszyny</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="hover:underline">Data ▼</button>
+                    <div class="absolute hidden group-hover:block bg-white shadow-md rounded-md py-2 w-40">
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Kolory</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Funkcje</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Tagi</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Kategorie Zleceń</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="hover:underline">Form ▼</button>
+                    <div class="absolute hidden group-hover:block bg-white shadow-md rounded-md py-2 w-40">
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Protokoły</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Odpowiedzi Protokołów</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Wypełnione Protokoły</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="hover:underline">Task ▼</button>
+                    <div class="absolute hidden group-hover:block bg-white shadow-md rounded-md py-2 w-40">
+                        <a href="{% url 'dispatch:tasks' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Zlecenia</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Statusy</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Notatki</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Załączniki</a>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="hover:underline">Worker ▼</button>
+                    <div class="absolute hidden group-hover:block bg-white shadow-md rounded-md py-2 w-40">
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Pracownicy</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Lokalizacje Pracowników</a>
+                    </div>
+                </div>
+            </div>
+            <a href="{% url 'dispatch:admin_logout' %}" class="bg-teal-500 px-4 py-2 rounded-md hover:bg-teal-600">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mx-auto mt-6 p-6 bg-white rounded-lg shadow">
+    {% block content %}{% endblock %}
+</div>
+</body>
+</html>

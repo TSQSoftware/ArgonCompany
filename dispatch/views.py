@@ -61,3 +61,8 @@ def dispatch_dashboard(request):
 def task_detail(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     return render(request, "dispatch/task_detail.html", {"task": task})
+
+@login_required
+def tasks_list(request):
+    return render(request, "dispatch/tasks_list.html", {"tasks": Task.objects.all()})
+

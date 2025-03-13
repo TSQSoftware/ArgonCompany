@@ -1,48 +1,118 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Details</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-        }
-        .back-btn {
-            display: inline-block;
-            background: gray;
-            color: white;
-            padding: 10px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
+{% extends "base_dashboard.html" %}
 
-<div class="container">
-    <h2>Task Details</h2>
-    <p><strong>Name:</strong> {{ task.name }}</p>
-    <p><strong>Category:</strong> {{ task.category.name|default:"No Category" }}</p>
-    <p><strong>Description:</strong> {{ task.description|default:"No description" }}</p>
-    <p><strong>Deadline:</strong> {{ task.deadline|default:"No deadline" }}</p>
-    <p><strong>Workers:</strong> {{ task.workers.all|join:", " }}</p>
-    <p><strong>Status:</strong> {{ task.status.name|default:"No status" }}</p>
+{% block title %}Task Detail{% endblock %}
 
-    <a href="{% url 'dispatch:dispatch_dashboard' %}" class="back-btn">Back to Dashboard</a>
-</div>
+{% block content %}
+    <h2 class="text-3xl font-bold text-gray-800 border-b pb-3 mb-6">Task Details</h2>
 
-</body>
-</html>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <h3 class="text-lg font-semibold text-gray-700">General Information</h3>
+            <div class="mt-3 space-y-2">
+                <p><span class="font-medium text-gray-600">Name:</span> {{ task.name }}</p>
+                <p><span
+                        class="font-medium text-gray-600">Category:</span> {{ task.category.name|default:"No Category" }}
+                </p>
+                <p><span
+                        class="font-medium text-gray-600">Description:</span> {{ task.description|default:"No description available" }}
+                </p>
+                <p><span class="font-medium text-gray-600">Status:</span>
+                    <span class="px-3 py-1 rounded-full text-sm font-semibold
+                            {% if task.status.name == 'Active' %} bg-green-200 text-green-700
+                            {% elif task.status.name == 'Pending' %} bg-yellow-200 text-yellow-700
+                            {% elif task.status.name == 'Completed' %} bg-blue-200 text-blue-700
+                            {% else %} bg-gray-200 text-gray-700
+                            {% endif %}">
+                            {{ task.status.name|default:"No status" }}
+                        </span>
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="text-lg font-semibold text-gray-700">Timeline</h3>
+            <div class="mt-3 space-y-2">
+                <p><span class="font-medium text-gray-600">Deadline:</span> {{ task.deadline|default:"No deadline" }}
+                </p>
+                <p><span
+                        class="font-medium text-gray-600">Expected Duration:</span> {{ task.expected_realization_duration|default:"Not specified" }}
+                </p>
+                <p><span
+                        class="font-medium text-gray-600">Expected Realization Date:</span> {{ task.expected_realization_date|default:"No date available" }}
+                </p>
+                <p><span
+                        class="font-medium text-gray-600">Completion Date:</span> {{ task.completion_date|default:"Not completed" }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+        <div>
+            <h3 class="text-lg font-semibold text-gray-700">Workers</h3>
+            <div class="mt-3">
+                {% for worker in task.workers.all %}
+                    <span class="inline-block bg-gray-200 text-gray-800 text-sm px-3 py-1 rounded-full mr-2 mb-2">
+                            {{ worker.first_name }} {{ worker.last_name }}
+                        </span>
+                {% empty %}
+                    <p class="text-gray-500">No workers assigned.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div>
+            <h3 class="text-lg font-semibold text-gray-700">Tags</h3>
+            <div class="mt-3">
+                {% for tag in task.tags.all %}
+                    <span class="inline-block bg-blue-200 text-blue-800 text-sm px-3 py-1 rounded-full mr-2 mb-2">
+                            {{ tag.name }}
+                        </span>
+                {% empty %}
+                    <p class="text-gray-500">No tags assigned.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+        <div>
+            <h3 class="text-lg font-semibold text-gray-700">Client & Location</h3>
+            <div class="mt-3 space-y-2">
+                <p><span
+                        class="font-medium text-gray-600">Client:</span> {{ task.client.name|default:"No client assigned" }}
+                </p>
+                <p><span
+                        class="font-medium text-gray-600">Address:</span> {{ task.address|default:"No address available" }}
+                </p>
+                <p><span
+                        class="font-medium text-gray-600">Contact Phone:</span> {{ task.contact_phone_number|default:"No phone number" }}
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="text-lg font-semibold text-gray-700">Client Assets</h3>
+            <div class="mt-3">
+                <p><span class="font-medium text-gray-600">Client Places:</span>
+                    {% for place in task.client_places.all %}
+                        <span class="inline-block bg-purple-200 text-purple-800 text-sm px-3 py-1 rounded-full mr-2 mb-2">
+                                {{ place.name }}
+                            </span>
+                    {% empty %}
+                        <span class="text-gray-500">No places assigned.</span>
+                    {% endfor %}
+                </p>
+                <p><span class="font-medium text-gray-600">Client Machines:</span>
+                    {% for machine in task.client_machines.all %}
+                        <span class="inline-block bg-red-200 text-red-800 text-sm px-3 py-1 rounded-full mr-2 mb-2">
+                                {{ machine.name }}
+                            </span>
+                    {% empty %}
+                        <span class="text-gray-500">No machines assigned.</span>
+                    {% endfor %}
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

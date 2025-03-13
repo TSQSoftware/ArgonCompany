@@ -30,7 +30,7 @@ class Task(models.Model):
     address = models.CharField(max_length=255, null=True, blank=True)
     contact_phone_number = models.CharField(max_length=50, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    workers = models.ManyToManyField(Worker, blank=True)
+    workers = models.ManyToManyField(Worker, blank=True, related_name='assigned_tasks')
     location = PlainLocationField(based_fields=['latitude', 'longitude'], zoom=7, null=True, blank=True)
     status = models.ForeignKey(TaskStatus, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks')
     expected_realization_duration = models.DurationField(null=True, blank=True)
@@ -109,10 +109,12 @@ def task_attachment_upload_path(instance, filename):
 def task_image_upload_path(instance, filename):
     return os.path.join('task_images', str(instance.id), filename)
 
+
 class AttachmentType(models.TextChoices):
     CLIENT_SIGNATURE = "client_signature", "Client Signature"
     WORKER_SIGNATURE = "worker_signature", "Worker Signature"
     FORM = "form", "Form"
+
 
 class TaskAttachment(models.Model):
     task = models.ForeignKey('Task', on_delete=models.CASCADE, related_name='attachments')

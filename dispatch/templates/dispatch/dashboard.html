@@ -1,148 +1,75 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dispatch Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-        }
-        h2, h3 {
-            text-align: center;
-        }
-        .logout-btn, .add-task-btn {
-            display: inline-block;
-            background: red;
-            color: white;
-            padding: 10px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        form {
-            margin-top: 20px;
-        }
-        .task-form input, .task-form select, .task-form textarea {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            margin-bottom: 10px;
-        }
-        .submit-btn {
-            background: blue;
-            color: white;
-            padding: 10px;
-            border: none;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
+{% extends "base_dashboard.html" %}
 
-<div class="container">
-    <h2>Dispatch Dashboard</h2>
-    <p>Welcome, {{ request.user.username }}!</p>
+{% block title %}Dashboard{% endblock %}
 
-    <h3>Add New Task</h3>
-    <form method="POST" class="task-form">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="submit-btn">Create Task</button>
-    </form>
+{% block content %}
+    <div class="max-w-6xl mx-auto mt-8 p-6 bg-white rounded-lg shadow">
+        <h2 class="text-2xl font-semibold">Dispatch Dashboard</h2>
+        <p class="mt-2 text-gray-700">Welcome, {{ request.user.username }}!</p>
 
-    <h3>Tasks</h3>
-    <table>
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Category</th>
-            <th>Workers</th>
-            <th>Status</th>
-            <th>Deadline</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for task in tasks %}
-            <tr>
-                <td>{{ task.name }}</td>
-                <td>
-                    {% if task.category %}
-                        {{ task.category.name }}
-                    {% else %}
-                        No Category
-                    {% endif %}
-                </td>
-                <td>{{ task.workers.count }}</td>
-                <td>
-                    {% if task.status %}
-                        {{ task.status.name }}
-                    {% else %}
-                        No status
-                    {% endif %}
-                </td>
-                <td>{{ task.deadline }}</td>
-                <td>
-                    <a href="{% url 'dispatch:task_detail' task.id %}">View Details</a>
-                </td>
+        <h3 class="text-xl font-semibold mt-6">Tasks</h3>
+        <table class="w-full mt-4 border border-gray-300 rounded-lg overflow-hidden">
+            <thead>
+            <tr class="bg-gray-200 text-gray-600 text-sm uppercase">
+                <th class="px-4 py-3">Name</th>
+                <th class="px-4 py-3">Category</th>
+                <th class="px-4 py-3">Workers</th>
+                <th class="px-4 py-3">Status</th>
+                <th class="px-4 py-3">Deadline</th>
             </tr>
-        {% empty %}
-            <tr>
-                <td colspan="6">No tasks available.</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% for task in tasks %}
+                <tr class="border-t hover:bg-gray-100">
+                    <td class="px-4 py-3">{{ task.name }}</td>
+                    <td class="px-4 py-3">{{ task.category.name|default:"No Category" }}</td>
+                    <td class="px-4 py-3">{{ task.workers.count }}</td>
+                    <td class="px-4 py-3">
+                        <span class="px-3 py-1 rounded-full text-sm
+                            {% if task.status.name == 'Active' %} bg-green-200 text-green-700
+                            {% else %} bg-yellow-200 text-yellow-700
+                            {% endif %}">
+                            {{ task.status.name|default:"No Status" }}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">{{ task.deadline|default:"N/A" }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-4">No tasks available.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-    <h3>Workers</h3>
-    <table>
-        <thead>
-        <tr>
-            <th>First name</th>
-            <th>Last name</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for worker in workers %}
-            <tr>
-                <td>{{ worker.first_name }}</td>
-                <td>{{ worker.last_name }}</td>
+        <h3 class="text-xl font-semibold mt-6">Workers</h3>
+        <table class="w-full mt-4 border border-gray-300 rounded-lg overflow-hidden">
+            <thead>
+            <tr class="bg-gray-200 text-gray-600 text-sm uppercase">
+                <th class="px-4 py-3">First name</th>
+                <th class="px-4 py-3">Last name</th>
+                <th class="px-4 py-3">Assigned tasks</th>
             </tr>
-        {% empty %}
-            <tr>
-                <td colspan="2">No workers available.</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{% url 'dispatch:admin_logout' %}" class="logout-btn">Logout</a>
-</div>
-
-</body>
-</html>
+            </thead>
+            <tbody>
+            {% for worker in workers %}
+                <tr class="border-t hover:bg-gray-100">
+                    <td class="px-4 py-3">{{ worker.first_name }}</td>
+                    <td class="px-4 py-3">{{ worker.last_name }}</td>
+                    <td class="px-4 py-3">
+                        {% if worker.assigned_tasks.all %}
+                            {{ worker.assigned_tasks.count }}
+                        {% else %}
+                            No tasks assigned
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center py-4">No workers available.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
